@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,17 +17,31 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.9/beautify-html.min.js"></script>
     <style>
         /* Tùy chỉnh thanh cuộn cho đẹp */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; }
-        ::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
 
-        .detail-content{
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        .detail-content {
             padding: 20px;
             overflow-y: auto;
             background-color: #fff;
             min-height: 100%;
         }
+
         .detail-content img {
             max-width: 100%;
             height: auto;
@@ -37,8 +52,421 @@
             height: 500px;
             border: 1px solid #ddd;
         }
+
+
+        /* ===== DETAIL CONTENT ===== */
+
+        .detail-content {
+            font-size: 17px !important;
+            text-align: justify;
+        }
+
+        .detail-content h1,
+        .detail-content h2,
+        .detail-content h3 {
+            font-weight: 600;
+            color: var(--color-text-title);
+        }
+
+        .detail-content h1,
+        .detail-content h2,
+        .detail-content h3,
+        .detail-content h4,
+        .detail-content h5,
+        .detail-content h6,
+        .detail-content p,
+        .detail-content table,
+        .detail-content blockquote,
+        .detail-content .embed-responsive {
+            font-size: 100%;
+            margin-bottom: 20px;
+        }
+
+        .detail-content li {
+            margin-bottom: 7px;
+        }
+
+        .detail-content a:not(.btn) {
+            font-weight: 300;
+            color: var(--color-blue);
+            text-decoration: none;
+        }
+
+        .detail-content a:not(.btn):hover,
+        .detail-content a:not(.btn):focus {
+            text-decoration: underline;
+        }
+
+        .detail-content img,
+        .detail-content iframe,
+        .detail-content object,
+        .detail-content embed {
+            max-width: 100%;
+            border-radius: var(--border-radius);
+        }
+
+        .detail-content img {
+            height: auto !important;
+        }
+
+        .detail-content .embed-responsive {
+            position: relative;
+            display: block;
+            width: 100%;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .detail-content .embed-responsive::before {
+            display: block;
+            content: "";
+            padding-top: 56.25%;
+        }
+
+        .detail-content .embed-responsive embed,
+        .detail-content .embed-responsive iframe,
+        .detail-content .embed-responsive object,
+        .detail-content .embed-responsive video {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        .detail-content .caption {
+            color: #666;
+            font-style: italic;
+            text-align: center;
+            margin-top: -10px;
+        }
+
+        .detail-content .link-more {
+            position: relative;
+            padding-left: 40px;
+        }
+
+        .detail-content .link-more:before {
+            position: absolute;
+            content: "»";
+            top: -8px;
+            left: 10px;
+            font-size: 36px;
+            line-height: 1;
+            -webkit-animation: bouncelinkmore 1s infinite linear;
+            animation: bouncelinkmore 1s infinite linear;
+        }
+
+        @keyframes bouncelinkmore {
+            0% {
+                opacity: 1;
+                -webkit-transform: translateX(0) scale(1);
+                transform: translateX(0) scale(1);
+            }
+
+            50% {
+                opacity: 0.8;
+                -webkit-transform: translateX(10px) scale(1);
+                transform: translateX(10px) scale(1);
+            }
+
+            51% {
+                opacity: 0.8;
+                -webkit-transform: translateX(-10px) scale(1);
+                transform: translateX(-10px) scale(1);
+            }
+
+            100% {
+                opacity: 1;
+                -webkit-transform: translateX(0) scale(1);
+                transform: translateX(0) scale(1);
+            }
+        }
+
+        @-webkit-keyframes bouncelinkmore {
+            0% {
+                opacity: 1;
+                -webkit-transform: translateX(0) scale(1);
+                transform: translateX(0) scale(1);
+            }
+
+            50% {
+                opacity: 0.8;
+                -webkit-transform: translateX(10px) scale(1);
+                transform: translateX(10px) scale(1);
+            }
+
+            51% {
+                opacity: 0.8;
+                -webkit-transform: translateX(-10px) scale(1);
+                transform: translateX(-10px) scale(1);
+            }
+
+            100% {
+                opacity: 1;
+                -webkit-transform: translateX(0) scale(1);
+                transform: translateX(0) scale(1);
+            }
+        }
+
+        /* ===== HEAD HIGHLIGHT ===== */
+        .detail-content .head-black,
+        .detail-content .head-blue,
+        .detail-content .head-red,
+        .detail-content .head-orange,
+        .detail-content .head-green {
+            font-size: 120%;
+            font-weight: 600;
+        }
+
+        .detail-content .head-blue {
+            color: #2f80ed;
+        }
+
+        .detail-content .head-red {
+            color: #e74c3c;
+        }
+
+        .detail-content .head-orange {
+            color: #fb6e2e;
+        }
+
+        .detail-content .head-green {
+            color: #28a745;
+        }
+
+        /* ===== LIST UL, OL ===== */
+        .detail-content ul {
+            list-style: disc;
+            padding: 0;
+            margin-left: 20px;
+            margin-bottom: 0;
+        }
+
+        .detail-content ul ul {
+            margin-top: 16px;
+        }
+
+        .detail-content ul li {
+            position: relative;
+            list-style: none;
+            vertical-align: middle;
+            padding-left: 16px;
+        }
+
+        .detail-content ul li:before {
+            content: "";
+            background: #777;
+            position: absolute;
+            left: 0;
+            top: 7px;
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .detail-content ol {
+            list-style: none;
+            counter-reset: my-awesome-counter;
+            margin: 0;
+            padding: 0;
+        }
+
+        .detail-content ol li {
+            counter-increment: my-awesome-counter;
+            position: relative;
+            display: block;
+            padding-left: 30px;
+        }
+
+        .detail-content ol li::before {
+            content: counter(my-awesome-counter);
+            background: #2f80ed;
+            position: absolute;
+            left: 0;
+            display: inline-block;
+            font-size: 90%;
+            width: 22px;
+            height: 22px;
+            line-height: 22px;
+            border-radius: 50%;
+            color: #fff;
+            text-align: center;
+        }
+
+        /* ===== BLOCKQUOTE ===== */
+        .detail-content blockquote {
+            background-color: #fff6ea;
+            border-left: 3px solid #ff6a00;
+            border-radius: 4px;
+            padding: 20px;
+        }
+
+        .detail-content blockquote h1:last-child,
+        .detail-content blockquote h2:last-child,
+        .detail-content blockquote h3:last-child,
+        .detail-content blockquote h4:last-child,
+        .detail-content blockquote h5:last-child,
+        .detail-content blockquote h6:last-child,
+        .detail-content blockquote li:last-child,
+        .detail-content blockquote p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* ===== ZIPPY CONTAINER ===== */
+        .detail-content .zippy-container {
+            padding: 10px 20px;
+            margin-bottom: 16px;
+            background-color: #f1f7ff;
+            border: 1px solid #c5d3e4;
+            border-radius: 12px;
+        }
+
+        .detail-content .zippy-container .zippy-title {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+            color: #333;
+            font-weight: bold;
+            line-height: 26px;
+            text-decoration: none;
+        }
+
+        .detail-content .zippy-container .zippy-title:hover,
+        .detail-content .zippy-container .zippy-title:focus,
+        .detail-content .zippy-container .zippy-title:active {
+            text-decoration: none;
+        }
+
+        .detail-content .zippy-container .zippy-title:after {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            content: "";
+            height: 20px;
+            width: 20px;
+            margin-top: -10px;
+            background: no-repeat url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAA7AAAAOwBeShxvQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAClSURBVFiF7dYxigIxGIDRl1mtRYSFLbyFpaBXsPCSNtaLzSp4CS1tFKaxU9TdLRxL7SYZMA8CSfXxEwghe3cBY0zRity+YhZQohc5/lAWWCWKwzJUmw6KyPFfHCM3s6yBAr4wTND+wxq21SHF2hQ41zzpK6eALkZoR45f8BO5mWUNFPCBvjQfkh0spHsJvwMO+Kx32Kf2AQNM3K8iphvmkZtZA/0D49JS30NdwWwAAAAASUVORK5CYII=");
+            background-size: 20px;
+        }
+
+        .detail-content .zippy-container .zippy-title.collapsed:after {
+            transform: scaleY(-1);
+            -webkit-transform: scaleY(-1);
+            -moz-transform: scaleY(-1);
+            -ms-transform: scaleY(-1);
+            -o-transform: scaleY(-1);
+        }
+
+        .detail-content .zippy-container .zippy-content {
+            font-size: 90%;
+            margin: 0;
+            padding: 6px 0;
+        }
+
+        .detail-content .zippy-container .zippy-content ol {
+            padding-left: 0px;
+        }
+
+        .detail-content .zippy-container .zippy-content ol ol {
+            padding-left: 0;
+        }
+
+        .detail-content .zippy-container .zippy-content ol ol li {
+            padding-left: 25px;
+        }
+
+        .detail-content .zippy-container .zippy-content ol ol li::before {
+            content: counters(my-awesome-counter, ".") " ";
+        }
+
+        .detail-content .zippy-container .zippy-content ul>li {
+            margin-bottom: 6px;
+        }
+
+        /* ===== TIMELINE ===== */
+        .detail-content .timeline {
+            list-style-type: none;
+            position: relative;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        .detail-content .timeline:before {
+            content: " ";
+            background: #2f80ed;
+            display: inline-block;
+            position: absolute;
+            left: 7px;
+            top: 3px;
+            width: 2px;
+            height: 100%;
+            z-index: 400;
+        }
+
+        .detail-content .timeline>li {
+            margin: 0 0 16px 0;
+            padding-left: 24px;
+            background: none !important;
+        }
+
+        .detail-content .timeline>li:before {
+            content: " ";
+            background: white;
+            display: inline-block;
+            position: absolute;
+            border-radius: 50%;
+            border: 3px solid #3367d6;
+            left: 0;
+            margin-top: -4px;
+            width: 16px;
+            height: 16px;
+            z-index: 400;
+        }
+
+        .detail-content .timeline>li>.timeline-title {
+            display: inline-block;
+            width: 100%;
+            color: #3367d6;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .detail-content .timeline>li p {
+            margin-bottom: 8px;
+        }
+
+        @media (max-width: 575px) {
+            .detail-content ul {
+                margin-left: 10px;
+            }
+
+            .detail-content ul ul {
+                margin-top: 10px;
+            }
+
+            .detail-content .zippy-container .zippy-content ol {
+                padding-left: 10px;
+            }
+        }
+
+        .detail-content table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #dee2e6;
+        }
+
+        .detail-content table td,
+        .detail-content table th {
+            padding: 7px;
+            border: 1px solid #dee2e6;
+        }
     </style>
 </head>
+
 <body class="bg-gray-100 h-screen flex flex-col overflow-hidden text-gray-800">
 
     <!-- Header -->
@@ -61,7 +489,7 @@
                     <i class="fa-solid fa-plus"></i>
                 </button>
             </div>
-            
+
             <!-- Form thêm profile (Ẩn mặc định) -->
             <div id="profileForm" class="hidden p-4 bg-indigo-50 border-b border-indigo-100 shrink-0">
                 <input type="text" id="profDomain" placeholder="Tên miền (VD: vnexpress.net)" class="w-full mb-2 p-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-indigo-500">
@@ -107,13 +535,23 @@
                         <input type="text" id="inputDesc" class="w-full p-2.5 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition" placeholder="Nhập mô tả tóm tắt...">
                     </div>
                 </div>
-                
+
                 <div class="flex-1 flex flex-col relative min-h-0">
-                    <label class="block text-sm font-semibold text-gray-700 mb-1 flex-shrink-0 flex justify-between items-end">
-                        <span>Nội dung HTML (Đã làm sạch)</span>
-                    </label>
-                    <div class="relative flex-1 rounded-lg border border-gray-300 overflow-hidden shadow-sm"> 
-                        <div class="detail-content"></div>
+                    <div class="flex justify-between items-end mb-1 flex-shrink-0">
+                        <label class="block text-sm font-semibold text-gray-700">Nội dung HTML (Đã làm sạch)</label>
+                        <!-- Tabs Navigation -->
+                        <div class="flex bg-gray-200 rounded-lg p-1 text-sm font-medium">
+                            <button id="tabPreview" class="px-3 py-1 rounded-md bg-white shadow-sm text-indigo-700 transition">Preview</button>
+                            <button id="tabCode" class="px-3 py-1 rounded-md text-gray-500 hover:text-gray-700 transition">HTML Code</button>
+                        </div>
+                    </div>
+                    <div class="relative flex-1 rounded-lg border border-gray-300 overflow-hidden shadow-sm bg-white">
+                        <div id="panelPreview" class="absolute inset-0 overflow-y-auto">
+                            <div class="detail-content"></div>
+                        </div>
+                        <div id="panelCode" class="absolute inset-0 hidden">
+                            <div id="editor" class="absolute inset-0"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -148,8 +586,34 @@
     </div>
 
     <!-- Script Logic -->
-    <script> 
-        $(document).ready(function() {
+    <script>
+        // Khởi tạo Ace Editor
+        const editor = ace.edit("editor");
+        editor.setTheme("ace/theme/monokai");
+        editor.session.setMode("ace/mode/html");
+        editor.setOptions({
+            wrap: true,
+            showPrintMargin: false,
+            fontSize: "14px",
+            useWorker: false 
+        });
+
+        $(document).ready(function () {
+            // --- TABS LOGIC ---
+            $('#tabPreview').on('click', function() {
+                $(this).addClass('bg-white shadow-sm text-indigo-700').removeClass('text-gray-500 hover:text-gray-700');
+                $('#tabCode').removeClass('bg-white shadow-sm text-indigo-700').addClass('text-gray-500 hover:text-gray-700');
+                $('#panelPreview').removeClass('hidden');
+                $('#panelCode').addClass('hidden');
+            });
+
+            $('#tabCode').on('click', function() {
+                $(this).addClass('bg-white shadow-sm text-indigo-700').removeClass('text-gray-500 hover:text-gray-700');
+                $('#tabPreview').removeClass('bg-white shadow-sm text-indigo-700').addClass('text-gray-500 hover:text-gray-700');
+                $('#panelCode').removeClass('hidden');
+                $('#panelPreview').addClass('hidden');
+            });
+
             // --- 1. QUẢN LÝ PROFILE (CỘT TRÁI) ---
             let profiles = JSON.parse(localStorage.getItem('scraperProfiles')) || [];
             let activeProfileId = localStorage.getItem('activeScraperProfile') || null;
@@ -162,11 +626,11 @@
             const savedRatio = localStorage.getItem('scraperCropRatio');
             if (savedRatio) $('#cropRatio').val(savedRatio);
 
-            $('#inputUrl').on('input', function() {
+            $('#inputUrl').on('input', function () {
                 localStorage.setItem('scraperUrl', $(this).val().trim());
             });
 
-            $('#cropRatio').on('change', function() {
+            $('#cropRatio').on('change', function () {
                 localStorage.setItem('scraperCropRatio', $(this).val());
             });
 
@@ -177,7 +641,7 @@
             function renderProfiles() {
                 const list = $('#profileList');
                 list.empty();
-                
+
                 if (profiles.length === 0) {
                     list.append('<li class="text-sm text-gray-400 italic p-4 text-center border border-dashed rounded-lg">Chưa có profile nào. Bấm + để thêm.</li>');
                     return;
@@ -207,14 +671,14 @@
                                 <span class="font-medium">C:</span> <code class="bg-gray-100 px-1 rounded">${prof.contentSel}</code>
                             </div>
                         `);
-                    
-                    li.on('click', function(e) {
+
+                    li.on('click', function (e) {
                         if ($(e.target).closest('.btn-edit-prof, .btn-del-prof').length) return;
                         activeProfileId = prof.id;
                         localStorage.setItem('activeScraperProfile', activeProfileId);
                         renderProfiles();
                     });
-                    
+
                     list.append(li);
                 });
             }
@@ -232,9 +696,9 @@
                 $('#profDomain, #profTitleSel, #profDescSel, #profContentSel').val('');
                 editingProfileId = null;
             });
-            
+
             // Xử lý sửa / xoá
-            $('#profileList').on('click', '.btn-edit-prof', function(e) {
+            $('#profileList').on('click', '.btn-edit-prof', function (e) {
                 e.stopPropagation();
                 const id = String($(this).data('id'));
                 const prof = profiles.find(p => p.id === id);
@@ -249,7 +713,7 @@
                 }
             });
 
-            $('#profileList').on('click', '.btn-del-prof', function(e) {
+            $('#profileList').on('click', '.btn-del-prof', function (e) {
                 e.stopPropagation();
                 if (confirm('Bạn có chắc muốn xoá profile này?')) {
                     const id = String($(this).data('id'));
@@ -293,10 +757,10 @@
                     profiles.push(newProfile);
                     activeProfileId = newProfile.id; // Active thẻ vừa tạo
                 }
-                
+
                 saveProfiles();
                 localStorage.setItem('activeScraperProfile', activeProfileId);
-                
+
                 $('#btnCancelProfile').click();
                 renderProfiles();
             });
@@ -306,15 +770,46 @@
             // --- 2. XỬ LÝ LẤY NỘI DUNG VÀ LÀM SẠCH HTML ---
 
             function cleanHtmlAttributes(rootElement, baseUrl) {
+                // Xoá tất cả comment (ghi chú) trong HTML
+                const treeWalker = document.createTreeWalker(rootElement, NodeFilter.SHOW_COMMENT, null, false);
+                const comments = [];
+                let currentNode;
+                while (currentNode = treeWalker.nextNode()) {
+                    comments.push(currentNode);
+                }
+                comments.forEach(comment => comment.remove());
+
                 // Xoá các thẻ không cần thiết như script, style, iframe
-                const badTags = rootElement.querySelectorAll('script, style, iframe');
+                const badTags = rootElement.querySelectorAll('script, style, iframe, div[class]');
                 badTags.forEach(tag => tag.remove());
-                
-                // Thay thế thẻ img bằng văn bản {{Hình X}}
-                const imgs = rootElement.querySelectorAll('img');
-                imgs.forEach((img, index) => {
-                    const textNode = document.createTextNode(`{{Hình ${index + 1}}}`);
-                    img.replaceWith(textNode);
+
+                // Thay thế thẻ img và figure bằng văn bản {{Hình X}}
+                let imgIndex = 1;
+                const imgs = Array.from(rootElement.querySelectorAll('img'));
+                imgs.forEach(img => {
+                    if (!rootElement.contains(img)) return; // Bỏ qua nếu đã bị xoá cùng figure cha
+
+                    const figure = img.closest('figure');
+                    
+                    const pImageMarker = document.createElement('p');
+                    pImageMarker.textContent = `{{Hình ${imgIndex}}}`;
+
+                    if (figure && rootElement.contains(figure)) {
+                        const figcaption = figure.querySelector('figcaption');
+                        let pTag = null;
+                        if (figcaption && figcaption.textContent.trim()) {
+                            pTag = document.createElement('p');
+                            pTag.textContent = figcaption.textContent.trim();
+                        }
+
+                        figure.replaceWith(pImageMarker);
+                        if (pTag) {
+                            pImageMarker.parentNode.insertBefore(pTag, pImageMarker.nextSibling);
+                        }
+                    } else {
+                        img.replaceWith(pImageMarker);
+                    }
+                    imgIndex++;
                 });
 
                 // Xoá (unwrap) tất cả thẻ <a> để giữ lại nội dung bên trong (kể cả text hay {{Hình X}})
@@ -329,11 +824,11 @@
                 // Xử lý thẻ h2, h3: chỉ chứa text, không chứa thẻ con
                 const headings = rootElement.querySelectorAll('h2, h3');
                 headings.forEach(h => {
-                    h.textContent = h.textContent; 
+                    h.textContent = h.textContent;
                 });
 
                 const elements = rootElement.querySelectorAll('*');
-                
+
                 elements.forEach(el => {
                     const tagName = el.tagName.toLowerCase();
 
@@ -347,7 +842,7 @@
                         el.className = 'head-black';
                     }
                 });
-                
+
                 // Format mã HTML cho đẹp bằng js-beautify
                 let cleanHTML = rootElement.innerHTML;
                 if (typeof html_beautify !== 'undefined') {
@@ -358,7 +853,7 @@
                         extra_liners: []
                     });
                 } else {
-                    cleanHTML = cleanHTML.replace(/>\s+</g, '>\n<'); 
+                    cleanHTML = cleanHTML.replace(/>\s+</g, '>\n<');
                 }
                 return cleanHTML;
             }
@@ -366,7 +861,7 @@
             function renderImages(rootElement, baseUrl) {
                 const imageList = $('#imageList');
                 imageList.empty();
-                
+
                 const imgs = rootElement.querySelectorAll('img');
                 if (imgs.length === 0) {
                     imageList.append('<div class="col-span-2 text-sm text-gray-500 italic text-center py-10">Không có hình ảnh nào trong bài viết.</div>');
@@ -381,7 +876,7 @@
                     if (!src) return;
                     try {
                         src = new URL(src, baseUrl).href;
-                    } catch(e) {}
+                    } catch (e) { }
 
                     const thumbHtml = `
                         <div class="relative group border border-gray-200 rounded-lg bg-white overflow-hidden shadow-sm aspect-square flex items-center justify-center hover:border-indigo-400 transition">
@@ -395,19 +890,19 @@
                     imageList.append(thumbHtml);
                 });
 
-                $('.btn-download').on('click', function() {
+                $('.btn-download').on('click', function () {
                     const imgSrc = $(this).data('src');
                     downloadAndCropImage(imgSrc);
                 });
             }
 
-            $('#btnDownloadAll').on('click', function() {
+            $('#btnDownloadAll').on('click', function () {
                 const buttons = $('.btn-download');
                 if (buttons.length === 0) return;
-                
+
                 if (confirm(`Bạn có chắc muốn tải toàn bộ ${buttons.length} hình ảnh không?`)) {
                     let delay = 0;
-                    buttons.each(function() {
+                    buttons.each(function () {
                         const imgSrc = $(this).data('src');
                         setTimeout(() => {
                             downloadAndCropImage(imgSrc);
@@ -462,25 +957,21 @@
 
                     // Lấy Nội dung
                     const contentEl = doc.querySelector(activeProfile.contentSel);
-                    
+
                     if (contentEl) {
                         // Render hình ảnh TRƯỚC KHI xoá attribute để có thể đọc data-src nếu web dùng lazyload
                         renderImages(contentEl, url);
-                        
+
                         // Clone để xử lý xoá attribute
                         const contentClone = contentEl.cloneNode(true);
                         const cleanedHtml = cleanHtmlAttributes(contentClone, url);
-                        
+
 
                         $(".detail-content").html(cleanedHtml);
-
-
-
-                        // editor.setValue(cleanedHtml);
-                        // editor.clearSelection();
-                        
+                        editor.setValue(cleanedHtml);
+                        editor.clearSelection();
                     } else {
-                        // editor.setValue('<!-- ⚠️ Không tìm thấy phần nội dung dựa trên cấu hình Class/ID của Profile hiện tại -->');
+                        editor.setValue('<!-- ⚠️ Không tìm thấy phần nội dung dựa trên cấu hình Class/ID của Profile hiện tại -->');
                         $('#imageList').empty();
                     }
 
@@ -493,16 +984,16 @@
             });
 
             // --- 3. XỬ LÝ CANVAS CROP & DOWNLOAD HÌNH ẢNH ---
-            
+
             function downloadAndCropImage(imgUrl) {
-                const ratioStr = $('#cropRatio').val(); 
+                const ratioStr = $('#cropRatio').val();
                 const parts = ratioStr.split('/');
                 const targetRatio = parseFloat(parts[0]) / parseFloat(parts[1]);
 
                 const img = new Image();
-                img.crossOrigin = "anonymous"; 
-                
-                img.onload = function() {
+                img.crossOrigin = "anonymous";
+
+                img.onload = function () {
                     const sWidth = img.width;
                     const sHeight = img.height;
                     const sourceRatio = sWidth / sHeight;
@@ -540,13 +1031,13 @@
                     const link = document.createElement('a');
                     link.href = dataUrl;
                     link.download = `IMG_${parts[0]}x${parts[1]}_${Math.floor(Date.now() / 1000)}.jpg`;
-                    
+
                     document.body.appendChild(link);
                     link.click();
                     document.body.removeChild(link);
                 };
 
-                img.onerror = function() {
+                img.onerror = function () {
                     alert('Lỗi tải ảnh vào Canvas! Ảnh này có thể chặn CORS, hãy kiểm tra lại cấu hình Extension.');
                 };
 
@@ -555,4 +1046,5 @@
         });
     </script>
 </body>
+
 </html>
