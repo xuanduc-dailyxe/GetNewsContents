@@ -528,11 +528,21 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 shrink-0">
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Tiêu đề tin tức</label>
-                        <input type="text" id="inputTitle" class="w-full p-2.5 border border-gray-300 rounded-lg bg-white text-gray-800 focus:outline-none" placeholder="Nhập tiêu đề tin tức...">
+                        <div class="relative">
+                            <input type="text" id="inputTitle" class="w-full p-2.5 pr-10 border border-gray-300 rounded-lg bg-white text-gray-800 focus:outline-none" placeholder="Nhập tiêu đề tin tức...">
+                            <button class="btn-copy absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-indigo-600 transition p-1.5 rounded" data-target="#inputTitle" title="Sao chép">
+                                <i class="fa-regular fa-copy"></i>
+                            </button>
+                        </div>
                     </div>
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Mô tả tin tức</label>
-                        <input type="text" id="inputDesc" class="w-full p-2.5 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition" placeholder="Nhập mô tả tóm tắt...">
+                        <div class="relative">
+                            <input type="text" id="inputDesc" class="w-full p-2.5 pr-10 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition" placeholder="Nhập mô tả tóm tắt...">
+                            <button class="btn-copy absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-indigo-600 transition p-1.5 rounded" data-target="#inputDesc" title="Sao chép">
+                                <i class="fa-regular fa-copy"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -551,6 +561,9 @@
                         </div>
                         <div id="panelCode" class="absolute inset-0 hidden">
                             <div id="editor" class="absolute inset-0"></div>
+                            <button id="btnCopyCode" class="absolute top-4 right-6 bg-white/90 border border-gray-300 shadow-sm text-gray-700 hover:text-indigo-600 rounded-md px-3 py-1.5 text-sm font-medium transition z-10 flex items-center gap-2 hover:bg-white backdrop-blur-sm" title="Sao chép mã HTML">
+                                <i class="fa-regular fa-copy"></i> Copy Code
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -585,6 +598,12 @@
 
     </div>
 
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-3 rounded-lg shadow-lg transform transition-all duration-300 translate-y-20 opacity-0 z-50 flex items-center gap-2 pointer-events-none">
+        <i class="fa-solid fa-circle-check text-green-400"></i>
+        <span id="toastMsg" class="font-medium text-sm">Sao chép thành công!</span>
+    </div>
+
     <!-- Script Logic -->
     <script>
         // Khởi tạo Ace Editor
@@ -599,6 +618,34 @@
         });
 
         $(document).ready(function () {
+            // --- TOAST & COPY LOGIC ---
+            let toastTimeout;
+            function showToast(message) {
+                $('#toastMsg').text(message);
+                $('#toast').removeClass('translate-y-20 opacity-0').addClass('translate-y-0 opacity-100');
+                clearTimeout(toastTimeout);
+                toastTimeout = setTimeout(() => {
+                    $('#toast').removeClass('translate-y-0 opacity-100').addClass('translate-y-20 opacity-0');
+                }, 2000);
+            }
+
+            $('.btn-copy').on('click', function() {
+                const targetId = $(this).data('target');
+                const text = $(targetId).val();
+                if (!text) return;
+                navigator.clipboard.writeText(text).then(() => {
+                    showToast('Đã sao chép vào Clipboard!');
+                });
+            });
+
+            $('#btnCopyCode').on('click', function() {
+                const text = editor.getValue();
+                if (!text) return;
+                navigator.clipboard.writeText(text).then(() => {
+                    showToast('Đã sao chép mã HTML!');
+                });
+            });
+
             // --- TABS LOGIC ---
             $('#tabPreview').on('click', function() {
                 $(this).addClass('bg-white shadow-sm text-indigo-700').removeClass('text-gray-500 hover:text-gray-700');
