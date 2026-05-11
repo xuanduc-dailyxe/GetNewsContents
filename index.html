@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Scraper & Image Processor</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <!-- Ace Code Editor -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/ace.js"></script>
+    <!-- js-beautify -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.9/beautify-html.min.js"></script>
+    <style>
+        /* Tùy chỉnh thanh cuộn cho đẹp */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+
+        .detail-content{
+            padding: 20px;
+            overflow-y: auto;
+            background-color: #fff;
+            min-height: 100%;
+        }
+        .detail-content img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .detail-content iframe {
+            width: 100%;
+            height: 500px;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 h-screen flex flex-col overflow-hidden text-gray-800">
+
+    <!-- Header -->
+    <header class="bg-indigo-600 text-white p-3 shadow-md z-10 flex justify-between items-center shrink-0">
+        <h1 class="text-lg font-bold flex items-center gap-2">
+            <i class="fa-solid fa-spider"></i> Web Scraper & Image Processor
+        </h1>
+    </header>
+
+    <!-- Main Container -->
+    <div class="flex flex-1 overflow-hidden">
+
+        <!-- CỘT 1: Sidebar Trái (Profile Website) -->
+        <div class="w-72 bg-white border-r border-gray-200 flex flex-col shrink-0 shadow-sm z-10">
+            <div class="p-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center shrink-0">
+                <h2 class="font-semibold text-gray-700 flex items-center gap-2">
+                    <i class="fa-solid fa-list"></i> Profiles Website
+                </h2>
+                <button id="btnAddProfile" class="text-indigo-600 hover:text-indigo-800 transition bg-indigo-100 hover:bg-indigo-200 w-7 h-7 rounded flex items-center justify-center" title="Thêm profile mới">
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+            </div>
+            
+            <!-- Form thêm profile (Ẩn mặc định) -->
+            <div id="profileForm" class="hidden p-4 bg-indigo-50 border-b border-indigo-100 shrink-0">
+                <input type="text" id="profDomain" placeholder="Tên miền (VD: vnexpress.net)" class="w-full mb-2 p-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-indigo-500">
+                <input type="text" id="profTitleSel" placeholder="Class/ID Tiêu đề (VD: .title-detail)" class="w-full mb-2 p-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-indigo-500">
+                <input type="text" id="profDescSel" placeholder="Class/ID Mô tả (VD: .description)" class="w-full mb-2 p-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-indigo-500">
+                <input type="text" id="profContentSel" placeholder="Class/ID Nội dung (VD: .fck_detail)" class="w-full mb-3 p-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-indigo-500">
+                <div class="flex justify-end gap-2">
+                    <button id="btnCancelProfile" class="px-3 py-1.5 bg-gray-200 text-gray-700 rounded text-sm hover:bg-gray-300 transition font-medium">Huỷ</button>
+                    <button id="btnSaveProfile" class="px-3 py-1.5 bg-indigo-600 text-white rounded text-sm hover:bg-indigo-700 transition font-medium">Lưu Profile</button>
+                </div>
+            </div>
+
+            <!-- Danh sách Profile -->
+            <ul id="profileList" class="flex-1 overflow-y-auto p-3 space-y-2">
+                <!-- Javascript sẽ render vào đây -->
+            </ul>
+        </div>
+
+        <!-- CỘT 2: Nội dung chính (Scraping & Editor) -->
+        <div class="flex-1 bg-gray-50 flex flex-col min-w-0">
+            <!-- Top bar -->
+            <div class="p-4 bg-white shadow-sm flex gap-3 border-b border-gray-200 shrink-0">
+                <div class="flex-1 relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fa-solid fa-link text-gray-400"></i>
+                    </div>
+                    <input type="text" id="inputUrl" placeholder="Nhập URL bài viết cần lấy nội dung..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+                </div>
+                <button id="btnGetContent" class="px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium flex items-center gap-2 shadow-sm whitespace-nowrap">
+                    <i class="fa-solid fa-cloud-arrow-down"></i> Get content
+                </button>
+            </div>
+
+            <!-- Main Workspace -->
+            <div class="p-4 flex-1 overflow-y-auto flex flex-col gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 shrink-0">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Tiêu đề tin tức</label>
+                        <input type="text" id="inputTitle" class="w-full p-2.5 border border-gray-300 rounded-lg bg-white text-gray-800 focus:outline-none" placeholder="Nhập tiêu đề tin tức...">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Mô tả tin tức</label>
+                        <input type="text" id="inputDesc" class="w-full p-2.5 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition" placeholder="Nhập mô tả tóm tắt...">
+                    </div>
+                </div>
+                
+                <div class="flex-1 flex flex-col relative min-h-0">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1 flex-shrink-0 flex justify-between items-end">
+                        <span>Nội dung HTML (Đã làm sạch)</span>
+                    </label>
+                    <div class="relative flex-1 rounded-lg border border-gray-300 overflow-hidden shadow-sm"> 
+                        <div class="detail-content"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CỘT 3: Sidebar Phải (Hình ảnh) -->
+        <div class="w-80 bg-white border-l border-gray-200 flex flex-col shrink-0 shadow-sm z-10">
+            <div class="p-4 bg-gray-50 border-b border-gray-200 shrink-0">
+                <h2 class="font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                    <i class="fa-regular fa-images"></i> Quản lý Hình ảnh
+                </h2>
+                <div class="flex items-center gap-2 bg-white p-2 border border-gray-200 rounded-lg">
+                    <label class="text-sm font-medium text-gray-600 whitespace-nowrap"><i class="fa-solid fa-crop-simple mr-1"></i> Tỉ lệ crop:</label>
+                    <select id="cropRatio" class="p-1 border-none focus:ring-0 text-sm flex-1 font-semibold text-indigo-700 bg-transparent cursor-pointer outline-none">
+                        <option value="4/3">4:3 (Tiêu chuẩn)</option>
+                        <option value="3/2">3:2 (Nhiếp ảnh)</option>
+                        <option value="16/9">16:9 (Màn hình rộng)</option>
+                    </select>
+                </div>
+                <button id="btnDownloadAll" class="mt-2 w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium flex items-center justify-center gap-2 shadow-sm text-sm hidden">
+                    <i class="fa-solid fa-download"></i> Tải tất cả hình
+                </button>
+            </div>
+
+            <!-- Image List -->
+            <div id="imageList" class="flex-1 overflow-y-auto p-4 grid grid-cols-2 gap-3 auto-rows-max bg-gray-50/50">
+                <!-- Javascript sẽ render thumbnail vào đây -->
+                <div class="col-span-2 text-sm text-gray-400 italic text-center py-10">Chưa có hình ảnh nào.</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Script Logic -->
+    <script> 
+        $(document).ready(function() {
+            // --- 1. QUẢN LÝ PROFILE (CỘT TRÁI) ---
+            let profiles = JSON.parse(localStorage.getItem('scraperProfiles')) || [];
+            let activeProfileId = localStorage.getItem('activeScraperProfile') || null;
+            let editingProfileId = null;
+
+            // --- LƯU TRỮ LOCALSTORAGE ---
+            const savedUrl = localStorage.getItem('scraperUrl');
+            if (savedUrl) $('#inputUrl').val(savedUrl);
+
+            const savedRatio = localStorage.getItem('scraperCropRatio');
+            if (savedRatio) $('#cropRatio').val(savedRatio);
+
+            $('#inputUrl').on('input', function() {
+                localStorage.setItem('scraperUrl', $(this).val().trim());
+            });
+
+            $('#cropRatio').on('change', function() {
+                localStorage.setItem('scraperCropRatio', $(this).val());
+            });
+
+            function saveProfiles() {
+                localStorage.setItem('scraperProfiles', JSON.stringify(profiles));
+            }
+
+            function renderProfiles() {
+                const list = $('#profileList');
+                list.empty();
+                
+                if (profiles.length === 0) {
+                    list.append('<li class="text-sm text-gray-400 italic p-4 text-center border border-dashed rounded-lg">Chưa có profile nào. Bấm + để thêm.</li>');
+                    return;
+                }
+
+                profiles.forEach(prof => {
+                    const isActive = prof.id === activeProfileId;
+                    const li = $('<li></li>')
+                        .addClass(`p-3 rounded-lg cursor-pointer border transition-all ${isActive ? 'bg-indigo-50 border-indigo-400 shadow-sm ring-1 ring-indigo-400' : 'bg-white border-gray-200 hover:border-indigo-300 hover:shadow-sm'}`)
+                        .attr('data-id', prof.id)
+                        .html(`
+                            <div class="flex justify-between items-start mb-1">
+                                <div class="font-bold text-sm ${isActive ? 'text-indigo-700' : 'text-gray-700'}">${prof.domain}</div>
+                                <div class="flex items-center gap-2">
+                                    ${isActive ? '<i class="fa-solid fa-circle-check text-indigo-500 text-sm"></i>' : ''}
+                                    <button class="btn-edit-prof text-gray-400 hover:text-blue-500 transition" data-id="${prof.id}" title="Sửa"><i class="fa-solid fa-pen text-xs"></i></button>
+                                    <button class="btn-del-prof text-gray-400 hover:text-red-500 transition" data-id="${prof.id}" title="Xoá"><i class="fa-solid fa-trash text-xs"></i></button>
+                                </div>
+                            </div>
+                            <div class="text-xs text-gray-500 truncate" title="Selector Tiêu đề: ${prof.titleSel}">
+                                <span class="font-medium">T:</span> <code class="bg-gray-100 px-1 rounded">${prof.titleSel}</code>
+                            </div>
+                            <div class="text-xs text-gray-500 truncate mt-1" title="Selector Mô tả: ${prof.descSel || ''}">
+                                <span class="font-medium">M:</span> <code class="bg-gray-100 px-1 rounded">${prof.descSel || ''}</code>
+                            </div>
+                            <div class="text-xs text-gray-500 truncate mt-1" title="Selector Nội dung: ${prof.contentSel}">
+                                <span class="font-medium">C:</span> <code class="bg-gray-100 px-1 rounded">${prof.contentSel}</code>
+                            </div>
+                        `);
+                    
+                    li.on('click', function(e) {
+                        if ($(e.target).closest('.btn-edit-prof, .btn-del-prof').length) return;
+                        activeProfileId = prof.id;
+                        localStorage.setItem('activeScraperProfile', activeProfileId);
+                        renderProfiles();
+                    });
+                    
+                    list.append(li);
+                });
+            }
+
+            // Sự kiện form profile
+            $('#btnAddProfile').on('click', () => {
+                editingProfileId = null;
+                $('#profDomain, #profTitleSel, #profDescSel, #profContentSel').val('');
+                $('#profileForm').slideDown('fast');
+                $('#profDomain').focus();
+            });
+
+            $('#btnCancelProfile').on('click', () => {
+                $('#profileForm').slideUp('fast');
+                $('#profDomain, #profTitleSel, #profDescSel, #profContentSel').val('');
+                editingProfileId = null;
+            });
+            
+            // Xử lý sửa / xoá
+            $('#profileList').on('click', '.btn-edit-prof', function(e) {
+                e.stopPropagation();
+                const id = String($(this).data('id'));
+                const prof = profiles.find(p => p.id === id);
+                if (prof) {
+                    editingProfileId = id;
+                    $('#profDomain').val(prof.domain);
+                    $('#profTitleSel').val(prof.titleSel);
+                    $('#profDescSel').val(prof.descSel || '');
+                    $('#profContentSel').val(prof.contentSel);
+                    $('#profileForm').slideDown('fast');
+                    $('#profDomain').focus();
+                }
+            });
+
+            $('#profileList').on('click', '.btn-del-prof', function(e) {
+                e.stopPropagation();
+                if (confirm('Bạn có chắc muốn xoá profile này?')) {
+                    const id = String($(this).data('id'));
+                    profiles = profiles.filter(p => p.id !== id);
+                    if (activeProfileId === id) {
+                        activeProfileId = profiles.length > 0 ? profiles[0].id : null;
+                        localStorage.setItem('activeScraperProfile', activeProfileId || '');
+                    }
+                    saveProfiles();
+                    renderProfiles();
+                }
+            });
+
+            $('#btnSaveProfile').on('click', () => {
+                const domain = $('#profDomain').val().trim();
+                const titleSel = $('#profTitleSel').val().trim();
+                const descSel = $('#profDescSel').val().trim();
+                const contentSel = $('#profContentSel').val().trim();
+
+                if (!domain || !titleSel || !contentSel) {
+                    alert("Vui lòng nhập Tên miền, Class/ID Tiêu đề và Nội dung!");
+                    return;
+                }
+
+                if (editingProfileId) {
+                    const prof = profiles.find(p => p.id === editingProfileId);
+                    if (prof) {
+                        prof.domain = domain;
+                        prof.titleSel = titleSel;
+                        prof.descSel = descSel;
+                        prof.contentSel = contentSel;
+                    }
+                } else {
+                    const newProfile = {
+                        id: Date.now().toString(),
+                        domain,
+                        titleSel,
+                        descSel,
+                        contentSel
+                    };
+                    profiles.push(newProfile);
+                    activeProfileId = newProfile.id; // Active thẻ vừa tạo
+                }
+                
+                saveProfiles();
+                localStorage.setItem('activeScraperProfile', activeProfileId);
+                
+                $('#btnCancelProfile').click();
+                renderProfiles();
+            });
+
+            renderProfiles();
+
+            // --- 2. XỬ LÝ LẤY NỘI DUNG VÀ LÀM SẠCH HTML ---
+
+            function cleanHtmlAttributes(rootElement, baseUrl) {
+                // Xoá các thẻ không cần thiết như script, style, iframe
+                const badTags = rootElement.querySelectorAll('script, style, iframe');
+                badTags.forEach(tag => tag.remove());
+                
+                // Thay thế thẻ img bằng văn bản {{Hình X}}
+                const imgs = rootElement.querySelectorAll('img');
+                imgs.forEach((img, index) => {
+                    const textNode = document.createTextNode(`{{Hình ${index + 1}}}`);
+                    img.replaceWith(textNode);
+                });
+
+                const elements = rootElement.querySelectorAll('*');
+                
+                elements.forEach(el => {
+                    const tagName = el.tagName.toLowerCase();
+                    let href = null;
+                    
+                    if (tagName === 'a') {
+                        href = el.getAttribute('href');
+                        if (href) {
+                            try { href = new URL(href, baseUrl).href; } catch(e) {}
+                        }
+                    }
+
+                    // Xoá tất cả attributes bằng vòng lặp while
+                    while (el.attributes.length > 0) {
+                        el.removeAttribute(el.attributes[0].name);
+                    }
+
+                    // Phục hồi lại href đã xử lý
+                    if (tagName === 'a' && href) {
+                        el.setAttribute('href', href);
+                    }
+                });
+                
+                // Format mã HTML cho đẹp bằng js-beautify
+                let cleanHTML = rootElement.innerHTML;
+                if (typeof html_beautify !== 'undefined') {
+                    cleanHTML = html_beautify(cleanHTML, {
+                        indent_size: 4,
+                        preserve_newlines: false,
+                        wrap_line_length: 0,
+                        extra_liners: []
+                    });
+                } else {
+                    cleanHTML = cleanHTML.replace(/>\s+</g, '>\n<'); 
+                }
+                return cleanHTML;
+            }
+
+            function renderImages(rootElement, baseUrl) {
+                const imageList = $('#imageList');
+                imageList.empty();
+                
+                const imgs = rootElement.querySelectorAll('img');
+                if (imgs.length === 0) {
+                    imageList.append('<div class="col-span-2 text-sm text-gray-500 italic text-center py-10">Không có hình ảnh nào trong bài viết.</div>');
+                    $('#btnDownloadAll').addClass('hidden');
+                    return;
+                }
+
+                $('#btnDownloadAll').removeClass('hidden');
+
+                imgs.forEach((img, index) => {
+                    let src = img.getAttribute('src') || img.getAttribute('data-src');
+                    if (!src) return;
+                    try {
+                        src = new URL(src, baseUrl).href;
+                    } catch(e) {}
+
+                    const thumbHtml = `
+                        <div class="relative group border border-gray-200 rounded-lg bg-white overflow-hidden shadow-sm aspect-square flex items-center justify-center hover:border-indigo-400 transition">
+                            <img src="${src}" class="max-w-full max-h-full object-cover w-full h-full" alt="Thumbnail">
+                            <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition"></div>
+                            <button class="btn-download absolute bottom-2 right-2 bg-indigo-600 hover:bg-indigo-700 text-white w-9 h-9 rounded-full shadow-lg transition transform translate-y-2 opacity-0 group-hover:opacity-100 group-hover:translate-y-0 flex justify-center items-center" data-src="${src}" title="Download JPG">
+                                <i class="fa-solid fa-download"></i>
+                            </button>
+                        </div>
+                    `;
+                    imageList.append(thumbHtml);
+                });
+
+                $('.btn-download').on('click', function() {
+                    const imgSrc = $(this).data('src');
+                    downloadAndCropImage(imgSrc);
+                });
+            }
+
+            $('#btnDownloadAll').on('click', function() {
+                const buttons = $('.btn-download');
+                if (buttons.length === 0) return;
+                
+                if (confirm(`Bạn có chắc muốn tải toàn bộ ${buttons.length} hình ảnh không?`)) {
+                    let delay = 0;
+                    buttons.each(function() {
+                        const imgSrc = $(this).data('src');
+                        setTimeout(() => {
+                            downloadAndCropImage(imgSrc);
+                        }, delay);
+                        delay += 300; // Tải lần lượt cách nhau 300ms
+                    });
+                }
+            });
+
+            $('#btnGetContent').on('click', async () => {
+                const url = $('#inputUrl').val().trim();
+                localStorage.setItem('scraperUrl', url);
+                if (!url) {
+                    alert('Vui lòng nhập URL!');
+                    return;
+                }
+
+                if (!activeProfileId) {
+                    alert('Vui lòng chọn hoặc thêm Profile Website bên cột trái trước!');
+                    return;
+                }
+
+                const activeProfile = profiles.find(p => p.id === activeProfileId);
+                if (!activeProfile) return;
+
+                const btn = $('#btnGetContent');
+                const originalText = btn.html();
+                btn.html('<i class="fa-solid fa-spinner fa-spin"></i> Fetching...').prop('disabled', true);
+
+                try {
+                    // Dùng AJAX thông thường do trình duyệt có extension bypass CORS
+                    const response = await $.ajax({
+                        url: url,
+                        method: 'GET',
+                        dataType: 'html'
+                    });
+
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(response, 'text/html');
+
+                    // Lấy và hiển thị Tiêu đề
+                    const titleEl = doc.querySelector(activeProfile.titleSel);
+                    $('#inputTitle').val(titleEl ? titleEl.textContent.trim() : '⚠️ Không tìm thấy tiêu đề (Kiểm tra lại Class/ID)');
+
+                    // Lấy và hiển thị Mô tả
+                    if (activeProfile.descSel) {
+                        const descEl = doc.querySelector(activeProfile.descSel);
+                        $('#inputDesc').val(descEl ? descEl.textContent.trim() : '');
+                    } else {
+                        $('#inputDesc').val('');
+                    }
+
+                    // Lấy Nội dung
+                    const contentEl = doc.querySelector(activeProfile.contentSel);
+                    
+                    if (contentEl) {
+                        // Render hình ảnh TRƯỚC KHI xoá attribute để có thể đọc data-src nếu web dùng lazyload
+                        renderImages(contentEl, url);
+                        
+                        // Clone để xử lý xoá attribute
+                        const contentClone = contentEl.cloneNode(true);
+                        const cleanedHtml = cleanHtmlAttributes(contentClone, url);
+                        
+
+                        $(".detail-content").html(cleanedHtml);
+
+
+
+                        // editor.setValue(cleanedHtml);
+                        // editor.clearSelection();
+                        
+                    } else {
+                        // editor.setValue('<!-- ⚠️ Không tìm thấy phần nội dung dựa trên cấu hình Class/ID của Profile hiện tại -->');
+                        $('#imageList').empty();
+                    }
+
+                } catch (error) {
+                    console.error(error);
+                    alert('Lỗi khi fetch nội dung! Đảm bảo Extension Bypass CORS đang hoạt động hoặc URL có thể truy cập được.');
+                } finally {
+                    btn.html(originalText).prop('disabled', false);
+                }
+            });
+
+            // --- 3. XỬ LÝ CANVAS CROP & DOWNLOAD HÌNH ẢNH ---
+            
+            function downloadAndCropImage(imgUrl) {
+                const ratioStr = $('#cropRatio').val(); 
+                const parts = ratioStr.split('/');
+                const targetRatio = parseFloat(parts[0]) / parseFloat(parts[1]);
+
+                const img = new Image();
+                img.crossOrigin = "anonymous"; 
+                
+                img.onload = function() {
+                    const sWidth = img.width;
+                    const sHeight = img.height;
+                    const sourceRatio = sWidth / sHeight;
+
+                    let cropWidth, cropHeight;
+
+                    // Tính toán Center Crop
+                    if (sourceRatio > targetRatio) {
+                        cropHeight = sHeight;
+                        cropWidth = sHeight * targetRatio;
+                    } else {
+                        cropWidth = sWidth;
+                        cropHeight = sWidth / targetRatio;
+                    }
+
+                    const cropX = (sWidth - cropWidth) / 2;
+                    const cropY = (sHeight - cropHeight) / 2;
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = cropWidth;
+                    canvas.height = cropHeight;
+                    const ctx = canvas.getContext('2d');
+
+                    // Lấp đầy màu nền trắng nếu ảnh PNG có transparency (Vì xuất ra JPG)
+                    ctx.fillStyle = "#ffffff";
+                    ctx.fillRect(0, 0, cropWidth, cropHeight);
+
+                    // Vẽ ảnh đã crop
+                    ctx.drawImage(img, cropX, cropY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
+
+                    // Export sang JPG chất lượng 90%
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+
+                    // Download file
+                    const link = document.createElement('a');
+                    link.href = dataUrl;
+                    link.download = `IMG_${parts[0]}x${parts[1]}_${Math.floor(Date.now() / 1000)}.jpg`;
+                    
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                };
+
+                img.onerror = function() {
+                    alert('Lỗi tải ảnh vào Canvas! Ảnh này có thể chặn CORS, hãy kiểm tra lại cấu hình Extension.');
+                };
+
+                img.src = imgUrl;
+            }
+        });
+    </script>
+</body>
+</html>
