@@ -846,7 +846,7 @@
                         let pTag = null;
                         if (figcaption && figcaption.textContent.trim()) {
                             pTag = document.createElement('p');
-                            pTag.className = 'caption';
+                            pTag.classList.add('caption');
                             pTag.textContent = figcaption.textContent.trim();
                         }
 
