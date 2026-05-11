@@ -317,27 +317,34 @@
                     img.replaceWith(textNode);
                 });
 
+                // Xoá (unwrap) tất cả thẻ <a> để giữ lại nội dung bên trong (kể cả text hay {{Hình X}})
+                const aTags = rootElement.querySelectorAll('a');
+                aTags.forEach(a => {
+                    while (a.firstChild) {
+                        a.parentNode.insertBefore(a.firstChild, a);
+                    }
+                    a.remove();
+                });
+
+                // Xử lý thẻ h2, h3: chỉ chứa text, không chứa thẻ con
+                const headings = rootElement.querySelectorAll('h2, h3');
+                headings.forEach(h => {
+                    h.textContent = h.textContent; 
+                });
+
                 const elements = rootElement.querySelectorAll('*');
                 
                 elements.forEach(el => {
                     const tagName = el.tagName.toLowerCase();
-                    let href = null;
-                    
-                    if (tagName === 'a') {
-                        href = el.getAttribute('href');
-                        if (href) {
-                            try { href = new URL(href, baseUrl).href; } catch(e) {}
-                        }
-                    }
 
                     // Xoá tất cả attributes bằng vòng lặp while
                     while (el.attributes.length > 0) {
                         el.removeAttribute(el.attributes[0].name);
                     }
 
-                    // Phục hồi lại href đã xử lý
-                    if (tagName === 'a' && href) {
-                        el.setAttribute('href', href);
+                    // Thêm class head-black cho h2, h3
+                    if (tagName === 'h2' || tagName === 'h3') {
+                        el.className = 'head-black';
                     }
                 });
                 
