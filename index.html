@@ -871,7 +871,8 @@
 
                 $('#btnDownloadAll').removeClass('hidden');
 
-                imgs.forEach((img, index) => {
+                let indexCounter = 1;
+                imgs.forEach((img) => {
                     let src = img.getAttribute('src') || img.getAttribute('data-src');
                     if (!src) return;
                     try {
@@ -882,17 +883,19 @@
                         <div class="relative group border border-gray-200 rounded-lg bg-white overflow-hidden shadow-sm aspect-square flex items-center justify-center hover:border-indigo-400 transition">
                             <img src="${src}" class="max-w-full max-h-full object-cover w-full h-full" alt="Thumbnail">
                             <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition"></div>
-                            <button class="btn-download absolute bottom-2 right-2 bg-indigo-600 hover:bg-indigo-700 text-white w-9 h-9 rounded-full shadow-lg transition transform translate-y-2 opacity-0 group-hover:opacity-100 group-hover:translate-y-0 flex justify-center items-center" data-src="${src}" title="Download JPG">
+                            <button class="btn-download absolute bottom-2 right-2 bg-indigo-600 hover:bg-indigo-700 text-white w-9 h-9 rounded-full shadow-lg transition transform translate-y-2 opacity-0 group-hover:opacity-100 group-hover:translate-y-0 flex justify-center items-center" data-src="${src}" data-index="${indexCounter}" title="Download JPG">
                                 <i class="fa-solid fa-download"></i>
                             </button>
                         </div>
                     `;
                     imageList.append(thumbHtml);
+                    indexCounter++;
                 });
 
                 $('.btn-download').on('click', function () {
                     const imgSrc = $(this).data('src');
-                    downloadAndCropImage(imgSrc);
+                    const imgIndex = $(this).data('index');
+                    downloadAndCropImage(imgSrc, imgIndex);
                 });
             }
 
@@ -904,8 +907,9 @@
                     let delay = 0;
                     buttons.each(function () {
                         const imgSrc = $(this).data('src');
+                        const imgIndex = $(this).data('index');
                         setTimeout(() => {
-                            downloadAndCropImage(imgSrc);
+                            downloadAndCropImage(imgSrc, imgIndex);
                         }, delay);
                         delay += 300; // Tải lần lượt cách nhau 300ms
                     });
@@ -985,7 +989,24 @@
 
             // --- 3. XỬ LÝ CANVAS CROP & DOWNLOAD HÌNH ẢNH ---
 
-            function downloadAndCropImage(imgUrl) {
+            function generateSlug(text) {
+                if (!text) return '';
+                return text.toString().toLowerCase()
+                    .replace(/[àáạảãâầấậẩẫăằắặẳẵ]/g, "a")
+                    .replace(/[èéẹẻẽêềếệểễ]/g, "e")
+                    .replace(/[ìíịỉĩ]/g, "i")
+                    .replace(/[òóọỏõôồốộổỗơờớợởỡ]/g, "o")
+                    .replace(/[ùúụủũưừứựửữ]/g, "u")
+                    .replace(/[ỳýỵỷỹ]/g, "y")
+                    .replace(/đ/g, "d")
+                    .replace(/\s+/g, '-')
+                    .replace(/[^\w\-]+/g, '')
+                    .replace(/\-\-+/g, '-')
+                    .replace(/^-+/, '')
+                    .replace(/-+$/, '');
+            }
+
+            function downloadAndCropImage(imgUrl, imgIndex) {
                 const ratioStr = $('#cropRatio').val();
                 const parts = ratioStr.split('/');
                 const targetRatio = parseFloat(parts[0]) / parseFloat(parts[1]);
@@ -1030,7 +1051,16 @@
                     // Download file
                     const link = document.createElement('a');
                     link.href = dataUrl;
-                    link.download = `IMG_${parts[0]}x${parts[1]}_${Math.floor(Date.now() / 1000)}.jpg`;
+                    
+                    const titleText = $('#inputTitle').val().trim();
+                    const slug = generateSlug(titleText);
+                    const idxStr = imgIndex !== undefined ? imgIndex : Math.floor(Date.now() / 1000);
+
+                    if (slug) {
+                        link.download = `${slug}-${idxStr}.jpg`;
+                    } else {
+                        link.download = `IMG_${parts[0]}x${parts[1]}_${idxStr}.jpg`;
+                    }
 
                     document.body.appendChild(link);
                     link.click();
