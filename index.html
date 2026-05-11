@@ -845,6 +845,13 @@
 
                 // Format mã HTML cho đẹp bằng js-beautify
                 let cleanHTML = rootElement.innerHTML;
+
+                // Thêm đoạn mô tả vào đầu nội dung
+                const descText = $('#inputDesc').val().trim();
+                if (descText) {
+                    cleanHTML = `<h2>${descText}</h2>\n` + cleanHTML;
+                }
+
                 if (typeof html_beautify !== 'undefined') {
                     cleanHTML = html_beautify(cleanHTML, {
                         indent_size: 4,
