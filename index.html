@@ -879,13 +879,17 @@
 
                 elements.forEach(el => {
                     const tagName = el.tagName.toLowerCase();
+                    const isCaption = el.classList.contains('caption');
 
                     // Xoá tất cả attributes bằng vòng lặp while
                     while (el.attributes.length > 0) {
                         el.removeAttribute(el.attributes[0].name);
                     }
 
-                    // Thêm class head-black cho h2, h3
+                    // Thêm lại class cho các thẻ đặc biệt
+                    if (isCaption) {
+                        el.className = 'caption';
+                    }
                     if (tagName === 'h2' || tagName === 'h3') {
                         el.className = 'head-black';
                     }
