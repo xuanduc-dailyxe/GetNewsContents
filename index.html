@@ -579,6 +579,7 @@
                 <div class="flex items-center gap-2 bg-white p-2 border border-gray-200 rounded-lg">
                     <label class="text-sm font-medium text-gray-600 whitespace-nowrap"><i class="fa-solid fa-crop-simple mr-1"></i> Tỉ lệ crop:</label>
                     <select id="cropRatio" class="p-1 border-none focus:ring-0 text-sm flex-1 font-semibold text-indigo-700 bg-transparent cursor-pointer outline-none">
+                        <option value="default">Default (Không crop ảnh)</option>
                         <option value="4/3">4:3 (Tiêu chuẩn)</option>
                         <option value="3/2">3:2 (Nhiếp ảnh)</option>
                         <option value="16/9">16:9 (Màn hình rộng)</option>
@@ -1067,8 +1068,6 @@
 
             function downloadAndCropImage(imgUrl, imgIndex) {
                 const ratioStr = $('#cropRatio').val();
-                const parts = ratioStr.split('/');
-                const targetRatio = parseFloat(parts[0]) / parseFloat(parts[1]);
 
                 const img = new Image();
                 img.crossOrigin = "anonymous";
@@ -1076,21 +1075,31 @@
                 img.onload = function () {
                     const sWidth = img.width;
                     const sHeight = img.height;
-                    const sourceRatio = sWidth / sHeight;
 
-                    let cropWidth, cropHeight;
+                    let cropWidth, cropHeight, cropX, cropY;
 
-                    // Tính toán Center Crop
-                    if (sourceRatio > targetRatio) {
-                        cropHeight = sHeight;
-                        cropWidth = sHeight * targetRatio;
-                    } else {
+                    if (ratioStr === 'default') {
                         cropWidth = sWidth;
-                        cropHeight = sWidth / targetRatio;
-                    }
+                        cropHeight = sHeight;
+                        cropX = 0;
+                        cropY = 0;
+                    } else {
+                        const parts = ratioStr.split('/');
+                        const targetRatio = parseFloat(parts[0]) / parseFloat(parts[1]);
+                        const sourceRatio = sWidth / sHeight;
 
-                    const cropX = (sWidth - cropWidth) / 2;
-                    const cropY = (sHeight - cropHeight) / 2;
+                        // Tính toán Center Crop
+                        if (sourceRatio > targetRatio) {
+                            cropHeight = sHeight;
+                            cropWidth = sHeight * targetRatio;
+                        } else {
+                            cropWidth = sWidth;
+                            cropHeight = sWidth / targetRatio;
+                        }
+
+                        cropX = (sWidth - cropWidth) / 2;
+                        cropY = (sHeight - cropHeight) / 2;
+                    }
 
                     const canvas = document.createElement('canvas');
                     canvas.width = cropWidth;
@@ -1105,7 +1114,7 @@
                     ctx.drawImage(img, cropX, cropY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
 
                     // Export sang JPG chất lượng 90%
-                    const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+                    const dataUrl = canvas.toDataURL('image/jpeg', 1.0);
 
                     // Download file
                     const link = document.createElement('a');
@@ -1118,7 +1127,12 @@
                     if (slug) {
                         link.download = `${slug}-${idxStr}.jpg`;
                     } else {
-                        link.download = `IMG_${parts[0]}x${parts[1]}_${idxStr}.jpg`;
+                        if (ratioStr === 'default') {
+                            link.download = `IMG_default_${idxStr}.jpg`;
+                        } else {
+                            const parts = ratioStr.split('/');
+                            link.download = `IMG_${parts[0]}x${parts[1]}_${idxStr}.jpg`;
+                        }
                     }
 
                     document.body.appendChild(link);
