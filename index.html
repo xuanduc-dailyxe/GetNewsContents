@@ -1068,6 +1068,42 @@
 
             function downloadAndCropImage(imgUrl, imgIndex) {
                 const ratioStr = $('#cropRatio').val();
+                
+                const titleText = $('#inputTitle').val().trim();
+                const slug = generateSlug(titleText);
+                const idxStr = imgIndex !== undefined ? imgIndex : Math.floor(Date.now() / 1000);
+
+                // Giữ nguyên ảnh GIF, không qua Canvas để khỏi mất animation
+                if (imgUrl.match(/\.gif(\?.*)?$/i)) {
+                    fetch(imgUrl)
+                        .then(res => res.blob())
+                        .then(blob => {
+                            const url = window.URL.createObjectURL(blob);
+                            const link = document.createElement('a');
+                            link.href = url;
+                            if (slug) {
+                                link.download = `${slug}-${idxStr}.gif`;
+                            } else {
+                                link.download = `IMG_default_${idxStr}.gif`;
+                            }
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                            window.URL.revokeObjectURL(url);
+                        })
+                        .catch(err => {
+                            console.error('Fetch GIF error:', err);
+                            // Fallback nếu lỗi fetch
+                            const link = document.createElement('a');
+                            link.href = imgUrl;
+                            link.target = '_blank';
+                            link.download = slug ? `${slug}-${idxStr}.gif` : `IMG_default_${idxStr}.gif`;
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                        });
+                    return;
+                }
 
                 const img = new Image();
                 img.crossOrigin = "anonymous";
@@ -1119,10 +1155,6 @@
                     // Download file
                     const link = document.createElement('a');
                     link.href = dataUrl;
-                    
-                    const titleText = $('#inputTitle').val().trim();
-                    const slug = generateSlug(titleText);
-                    const idxStr = imgIndex !== undefined ? imgIndex : Math.floor(Date.now() / 1000);
 
                     if (slug) {
                         link.download = `${slug}-${idxStr}.jpg`;
