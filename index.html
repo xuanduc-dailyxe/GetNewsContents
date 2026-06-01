@@ -496,6 +496,11 @@
                 <input type="text" id="profTitleSel" placeholder="Class/ID Tiêu đề (VD: .title-detail)" class="w-full mb-2 p-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-indigo-500">
                 <input type="text" id="profDescSel" placeholder="Class/ID Mô tả (VD: .description)" class="w-full mb-2 p-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-indigo-500">
                 <input type="text" id="profContentSel" placeholder="Class/ID Nội dung (VD: .fck_detail)" class="w-full mb-3 p-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-indigo-500">
+                <input type="text" id="profGallery" placeholder="Class/ID Danh sách hình (VD: .swiper-wrapper img)" class="w-full mb-2 p-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-indigo-500">
+                <div class="flex gap-2 mb-3">
+                    <input type="text" id="profImgReplace" placeholder="Text cần replace (VD: 400x0)" class="w-1/2 p-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-indigo-500">
+                    <input type="text" id="profImgReplaceTo" placeholder="Replace thành (VD: 1200x0)" class="w-1/2 p-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-indigo-500">
+                </div>
                 <div class="flex justify-end gap-2">
                     <button id="btnCancelProfile" class="px-3 py-1.5 bg-gray-200 text-gray-700 rounded text-sm hover:bg-gray-300 transition font-medium">Huỷ</button>
                     <button id="btnSaveProfile" class="px-3 py-1.5 bg-indigo-600 text-white rounded text-sm hover:bg-indigo-700 transition font-medium">Lưu Profile</button>
@@ -732,6 +737,11 @@
                             <div class="text-xs text-gray-500 truncate mt-1" title="Selector Nội dung: ${prof.contentSel}">
                                 <span class="font-medium">C:</span> <code class="bg-gray-100 px-1 rounded">${prof.contentSel}</code>
                             </div>
+                            ${prof.gallerySel ? `
+                            <div class="text-xs text-gray-500 truncate mt-1" title="Selector Gallery: ${prof.gallerySel}">
+                                <span class="font-medium">G:</span> <code class="bg-gray-100 px-1 rounded">${prof.gallerySel}</code>
+                            </div>
+                            ` : ''}
                         `);
 
                     li.on('click', function (e) {
@@ -748,14 +758,14 @@
             // Sự kiện form profile
             $('#btnAddProfile').on('click', () => {
                 editingProfileId = null;
-                $('#profDomain, #profTitleSel, #profDescSel, #profContentSel').val('');
+                $('#profDomain, #profTitleSel, #profDescSel, #profContentSel, #profGallery, #profImgReplace, #profImgReplaceTo').val('');
                 $('#profileForm').slideDown('fast');
                 $('#profDomain').focus();
             });
 
             $('#btnCancelProfile').on('click', () => {
                 $('#profileForm').slideUp('fast');
-                $('#profDomain, #profTitleSel, #profDescSel, #profContentSel').val('');
+                $('#profDomain, #profTitleSel, #profDescSel, #profContentSel, #profGallery, #profImgReplace, #profImgReplaceTo').val('');
                 editingProfileId = null;
             });
 
@@ -770,6 +780,9 @@
                     $('#profTitleSel').val(prof.titleSel);
                     $('#profDescSel').val(prof.descSel || '');
                     $('#profContentSel').val(prof.contentSel);
+                    $('#profGallery').val(prof.gallerySel || '');
+                    $('#profImgReplace').val(prof.imgReplace || '');
+                    $('#profImgReplaceTo').val(prof.imgReplaceTo || '');
                     $('#profileForm').slideDown('fast');
                     $('#profDomain').focus();
                 }
@@ -794,6 +807,9 @@
                 const titleSel = $('#profTitleSel').val().trim();
                 const descSel = $('#profDescSel').val().trim();
                 const contentSel = $('#profContentSel').val().trim();
+                const gallerySel = $('#profGallery').val().trim();
+                const imgReplace = $('#profImgReplace').val().trim();
+                const imgReplaceTo = $('#profImgReplaceTo').val().trim();
 
                 if (!domain || !titleSel || !contentSel) {
                     alert("Vui lòng nhập Tên miền, Class/ID Tiêu đề và Nội dung!");
@@ -807,6 +823,9 @@
                         prof.titleSel = titleSel;
                         prof.descSel = descSel;
                         prof.contentSel = contentSel;
+                        prof.gallerySel = gallerySel;
+                        prof.imgReplace = imgReplace;
+                        prof.imgReplaceTo = imgReplaceTo;
                     }
                 } else {
                     const newProfile = {
@@ -814,7 +833,10 @@
                         domain,
                         titleSel,
                         descSel,
-                        contentSel
+                        contentSel,
+                        gallerySel,
+                        imgReplace,
+                        imgReplaceTo
                     };
                     profiles.push(newProfile);
                     activeProfileId = newProfile.id; // Active thẻ vừa tạo
@@ -932,11 +954,18 @@
                 return cleanHTML;
             }
 
-            function renderImages(rootElement, baseUrl) {
+            function renderImages(doc, rootElement, activeProfile, baseUrl) {
                 const imageList = $('#imageList');
                 imageList.empty();
 
-                const imgs = rootElement.querySelectorAll('img');
+                let imgs = [];
+                if (activeProfile.gallerySel) {
+                    imgs = Array.from(doc.querySelectorAll(activeProfile.gallerySel));
+                }
+                if (imgs.length === 0 && rootElement) {
+                    imgs = Array.from(rootElement.querySelectorAll('img'));
+                }
+
                 if (imgs.length === 0) {
                     imageList.append('<div class="col-span-2 text-sm text-gray-500 italic text-center py-10">Không có hình ảnh nào trong bài viết.</div>');
                     $('#btnDownloadAll').addClass('hidden');
@@ -952,6 +981,10 @@
                     try {
                         src = new URL(src, baseUrl).href;
                     } catch (e) { }
+
+                    if (activeProfile.imgReplace) {
+                        src = src.split(activeProfile.imgReplace).join(activeProfile.imgReplaceTo || '');
+                    }
 
                     const thumbHtml = `
                         <div class="relative group border border-gray-200 rounded-lg bg-white overflow-hidden shadow-sm aspect-square flex items-center justify-center hover:border-indigo-400 transition">
@@ -1036,10 +1069,10 @@
                     // Lấy Nội dung
                     const contentEl = doc.querySelector(activeProfile.contentSel);
 
-                    if (contentEl) {
-                        // Render hình ảnh TRƯỚC KHI xoá attribute để có thể đọc data-src nếu web dùng lazyload
-                        renderImages(contentEl, url);
+                    // Render hình ảnh TRƯỚC KHI xoá attribute để có thể đọc data-src nếu web dùng lazyload
+                    renderImages(doc, contentEl, activeProfile, url);
 
+                    if (contentEl) {
                         // Clone để xử lý xoá attribute
                         const contentClone = contentEl.cloneNode(true);
                         const cleanedHtml = cleanHtmlAttributes(contentClone, url);
@@ -1050,7 +1083,6 @@
                         editor.clearSelection();
                     } else {
                         editor.setValue('<!-- ⚠️ Không tìm thấy phần nội dung dựa trên cấu hình Class/ID của Profile hiện tại -->');
-                        $('#imageList').empty();
                     }
 
                 } catch (error) {
