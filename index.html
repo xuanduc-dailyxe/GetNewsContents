@@ -960,7 +960,10 @@
 
                 let imgs = [];
                 if (activeProfile.gallerySel) {
-                    imgs = Array.from(doc.querySelectorAll(activeProfile.gallerySel));
+                    var galleryEl = doc.querySelectorAll(activeProfile.gallerySel);
+                    if (galleryEl.length > 0) {
+                        imgs = Array.from(galleryEl[0].querySelectorAll('img'));
+                    }
                 }
                 if (imgs.length === 0 && rootElement) {
                     imgs = Array.from(rootElement.querySelectorAll('img'));
@@ -1071,6 +1074,9 @@
 
                     // Render hình ảnh TRƯỚC KHI xoá attribute để có thể đọc data-src nếu web dùng lazyload
                     renderImages(doc, contentEl, activeProfile, url);
+
+                    const galleryEl = doc.querySelector(activeProfile.gallerySel);
+                    renderImages(doc, galleryEl, activeProfile, url);
 
                     if (contentEl) {
                         // Clone để xử lý xoá attribute
