@@ -955,6 +955,8 @@
             }
 
             function renderImages(doc, rootElement, activeProfile, baseUrl) {
+                console.log('rootElement', rootElement);
+                console.log('activeProfile', activeProfile);
                 const imageList = $('#imageList');
                 imageList.empty();
 
@@ -965,11 +967,11 @@
                         imgs = Array.from(galleryEl[0].querySelectorAll('img'));
                     }
                 }
-                
+
                 if(activeProfile.contentSelector) {
-                    var contentEl = doc.querySelector(activeProfile.contentSelector);
+                    var contentEl = doc.querySelectorAll(activeProfile.contentSelector);
                     if (contentEl) {
-                        imgs = Array.from(contentEl.querySelectorAll('img'));
+                        imgs = Array.from(contentEl[0].querySelectorAll('img'));
                     }
                 }
 
