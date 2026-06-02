@@ -968,7 +968,7 @@
                     }
                 }
 
-                if (activeProfile.contentSelector) {
+                if (activeProfile.contentSel) {
                     var contentEl = doc.querySelectorAll(activeProfile.contentSel);
                     if (contentEl.length > 0) {
                         imgs = Array.from(contentEl[0].querySelectorAll('img'));
@@ -1085,8 +1085,10 @@
                     // Render hình ảnh TRƯỚC KHI xoá attribute để có thể đọc data-src nếu web dùng lazyload
                     renderImages(doc, contentEl, activeProfile, url);
 
-                    const galleryEl = doc.querySelector(activeProfile.gallerySel);
-                    renderImages(doc, galleryEl, activeProfile, url);
+                    if (activeProfile.gallerySel) {
+                        const galleryEl = doc.querySelector(activeProfile.gallerySel);
+                        renderImages(doc, galleryEl, activeProfile, url);
+                    }
 
                     if (contentEl) {
                         // Clone để xử lý xoá attribute
