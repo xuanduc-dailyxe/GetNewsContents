@@ -965,6 +965,13 @@
                         imgs = Array.from(galleryEl[0].querySelectorAll('img'));
                     }
                 }
+                if(activeProfile.contentSelector && imgs.length == 0) {
+                    var contentEl = doc.querySelector(activeProfile.contentSelector);
+                    if (contentEl) {
+                        imgs = Array.from(contentEl.querySelectorAll('img'));
+                    }
+                }
+
                 if (imgs.length === 0 && rootElement) {
                     imgs = Array.from(rootElement.querySelectorAll('img'));
                 }
