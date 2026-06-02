@@ -15,6 +15,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/ace.js"></script>
     <!-- js-beautify -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.9/beautify-html.min.js"></script>
+    <!-- JSZip -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <!-- FileSaver -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <style>
         /* Tùy chỉnh thanh cuộn cho đẹp */
         ::-webkit-scrollbar {
@@ -591,9 +595,14 @@
                     </div>
                     <input type="hidden" id="cropRatio" value="default">
                 </div>
-                <button id="btnDownloadAll" class="mt-2 w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium flex items-center justify-center gap-2 shadow-sm text-sm hidden">
-                    <i class="fa-solid fa-download"></i> Tải tất cả hình
-                </button>
+                <div id="downloadButtons" class="mt-2 flex gap-2 hidden">
+                    <button id="btnDownloadAll" class="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium flex items-center justify-center gap-2 shadow-sm text-sm" title="Tải từng hình">
+                        <i class="fa-solid fa-download"></i> Tải tất cả
+                    </button>
+                    <button id="btnDownloadZip" class="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium flex items-center justify-center gap-2 shadow-sm text-sm" title="Tải 1 file Zip">
+                        <i class="fa-solid fa-file-zipper"></i> Tải Zip
+                    </button>
+                </div>
             </div>
 
             <!-- Image List -->
@@ -625,6 +634,8 @@
         });
 
         $(document).ready(function () {
+            const imageList = $('#imageList');
+
             // --- TOAST & COPY LOGIC ---
             let toastTimeout;
             function showToast(message) {
@@ -954,38 +965,17 @@
                 return cleanHTML;
             }
 
-            function renderImages(doc, rootElement, activeProfile, baseUrl) {
-                console.log('rootElement', rootElement);
-                console.log('activeProfile', activeProfile);
-                const imageList = $('#imageList');
-                imageList.empty();
-
-                let imgs = [];
-                if (activeProfile.gallerySel) {
-                    var galleryEl = doc.querySelectorAll(activeProfile.gallerySel);
-                    if (galleryEl.length > 0) {
-                        imgs = Array.from(galleryEl[0].querySelectorAll('img'));
-                    }
-                }
-
-                if (activeProfile.contentSel) {
-                    var contentEl = doc.querySelectorAll(activeProfile.contentSel);
-                    if (contentEl.length > 0) {
-                        imgs = Array.from(contentEl[0].querySelectorAll('img'));
-                    }
-                }
-
-                if (imgs.length === 0 && rootElement) {
-                    imgs = Array.from(rootElement.querySelectorAll('img'));
-                }
+            function renderImages(doc, rootElement, activeProfile, baseUrl) {  
+                let imgs = [];  
+                imgs = Array.from(rootElement.querySelectorAll('img'));
 
                 if (imgs.length === 0) {
                     imageList.append('<div class="col-span-2 text-sm text-gray-500 italic text-center py-10">Không có hình ảnh nào trong bài viết.</div>');
-                    $('#btnDownloadAll').addClass('hidden');
+                    $('#downloadButtons').addClass('hidden');
                     return;
                 }
 
-                $('#btnDownloadAll').removeClass('hidden');
+                $('#downloadButtons').removeClass('hidden');
 
                 let indexCounter = 1;
                 imgs.forEach((img) => {
@@ -1036,8 +1026,128 @@
                 }
             });
 
+            function processImageForZip(imgUrl, imgIndex, slug, ratioStr) {
+                return new Promise((resolve, reject) => {
+                    const idxStr = imgIndex !== undefined ? imgIndex : Math.floor(Date.now() / 1000);
+                    
+                    if (imgUrl.match(/\.gif(\?.*)?$/i)) {
+                        const filename = slug ? `${slug}-${idxStr}.gif` : `IMG_default_${idxStr}.gif`;
+                        fetch(imgUrl)
+                            .then(res => res.blob())
+                            .then(blob => resolve({ filename, blob }))
+                            .catch(err => reject(err));
+                        return;
+                    }
+
+                    const img = new Image();
+                    img.crossOrigin = "anonymous";
+                    img.onload = function () {
+                        const sWidth = img.width;
+                        const sHeight = img.height;
+                        let cropWidth, cropHeight, cropX, cropY;
+
+                        if (ratioStr === 'default') {
+                            cropWidth = sWidth;
+                            cropHeight = sHeight;
+                            cropX = 0;
+                            cropY = 0;
+                        } else {
+                            const parts = ratioStr.split('/');
+                            const targetRatio = parseFloat(parts[0]) / parseFloat(parts[1]);
+                            const sourceRatio = sWidth / sHeight;
+                            if (sourceRatio > targetRatio) {
+                                cropHeight = sHeight;
+                                cropWidth = sHeight * targetRatio;
+                            } else {
+                                cropWidth = sWidth;
+                                cropHeight = sWidth / targetRatio;
+                            }
+                            cropX = (sWidth - cropWidth) / 2;
+                            cropY = (sHeight - cropHeight) / 2;
+                        }
+
+                        const canvas = document.createElement('canvas');
+                        canvas.width = cropWidth;
+                        canvas.height = cropHeight;
+                        const ctx = canvas.getContext('2d');
+                        ctx.fillStyle = "#ffffff";
+                        ctx.fillRect(0, 0, cropWidth, cropHeight);
+                        ctx.drawImage(img, cropX, cropY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
+
+                        canvas.toBlob((blob) => {
+                            let filename;
+                            if (slug) {
+                                filename = `${slug}-${idxStr}.jpg`;
+                            } else {
+                                if (ratioStr === 'default') {
+                                    filename = `IMG_default_${idxStr}.jpg`;
+                                } else {
+                                    const parts = ratioStr.split('/');
+                                    filename = `IMG_${parts[0]}x${parts[1]}_${idxStr}.jpg`;
+                                }
+                            }
+                            resolve({ filename, blob });
+                        }, 'image/jpeg', 1.0);
+                    };
+                    img.onerror = function () {
+                        reject(new Error('Canvas CORS error'));
+                    };
+                    img.src = imgUrl;
+                });
+            }
+
+            $('#btnDownloadZip').on('click', async function () {
+                const buttons = $('.btn-download');
+                if (buttons.length === 0) return;
+
+                 
+                const btn = $(this);
+                const originalText = btn.html();
+                btn.html('<i class="fa-solid fa-spinner fa-spin"></i> Đang nén...').prop('disabled', true);
+
+                const ratioStr = $('#cropRatio').val();
+                const titleText = $('#inputTitle').val().trim();
+                const slug = generateSlug(titleText);
+                
+                const zip = new JSZip();
+                let successCount = 0;
+
+                for (let i = 0; i < buttons.length; i++) {
+                    const btnEl = $(buttons[i]);
+                    const imgSrc = btnEl.data('src');
+                    const imgIndex = btnEl.data('index');
+                    
+                    try {
+                        const { filename, blob } = await processImageForZip(imgSrc, imgIndex, slug, ratioStr);
+                        zip.file(filename, blob);
+                        successCount++;
+                    } catch (err) {
+                        console.error(`Lỗi xử lý ảnh ${imgIndex}:`, err);
+                    }
+                }
+
+                if (successCount > 0) {
+                    btn.html('<i class="fa-solid fa-spinner fa-spin"></i> Đang tải...');
+                    try {
+                        const zipBlob = await zip.generateAsync({ type: "blob" });
+                        const zipFilename = slug ? `${slug}.zip` : `Images_${Math.floor(Date.now() / 1000)}.zip`;
+                        saveAs(zipBlob, zipFilename);
+                    } catch (e) {
+                        alert("Lỗi khi tạo file ZIP");
+                        console.error(e);
+                    }
+                } else {
+                    alert("Không có hình ảnh nào được xử lý thành công để nén ZIP.");
+                }
+
+                btn.html(originalText).prop('disabled', false);
+            });
+               
+          
+
             $('#btnGetContent').on('click', async () => {
                 const url = $('#inputUrl').val().trim();
+                imageList.empty();
                 localStorage.setItem('scraperUrl', url);
                 if (!url) {
                     alert('Vui lòng nhập URL!');
