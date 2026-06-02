@@ -968,9 +968,9 @@
                     }
                 }
 
-                if(activeProfile.contentSelector) {
+                if (activeProfile.contentSelector) {
                     var contentEl = doc.querySelectorAll(activeProfile.contentSelector);
-                    if (contentEl) {
+                    if (contentEl.length > 0) {
                         imgs = Array.from(contentEl[0].querySelectorAll('img'));
                     }
                 }
