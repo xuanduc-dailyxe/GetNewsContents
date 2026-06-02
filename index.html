@@ -1195,9 +1195,12 @@
                     // Render hình ảnh TRƯỚC KHI xoá attribute để có thể đọc data-src nếu web dùng lazyload
                     renderImages(doc, contentEl, activeProfile, url);
 
-                    if (activeProfile.gallerySel) {
-                        const galleryEl = doc.querySelector(activeProfile.gallerySel);
-                        renderImages(doc, galleryEl, activeProfile, url);
+                    if (activeProfile.gallerySel) { 
+                        const galleryEls = activeProfile.gallerySel.split(',');
+                        galleryEls.forEach(galleryEl => {
+                            const gallery = doc.querySelector(galleryEl);
+                            renderImages(doc, gallery, activeProfile, url);
+                        });
                     }
 
                     if (contentEl) {
