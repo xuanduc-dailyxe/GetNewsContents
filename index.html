@@ -635,6 +635,7 @@
 
         $(document).ready(function () {
             const imageList = $('#imageList');
+            let indexCounter = 1;
 
             // --- TOAST & COPY LOGIC ---
             let toastTimeout;
@@ -977,7 +978,7 @@
 
                 $('#downloadButtons').removeClass('hidden');
 
-                let indexCounter = 1;
+                
                 imgs.forEach((img) => {
                     let src = img.getAttribute('src') || img.getAttribute('data-src');
                     if (!src) return;
@@ -1148,6 +1149,7 @@
             $('#btnGetContent').on('click', async () => {
                 const url = $('#inputUrl').val().trim();
                 imageList.empty();
+                indexCounter = 1;
                 localStorage.setItem('scraperUrl', url);
                 if (!url) {
                     alert('Vui lòng nhập URL!');
