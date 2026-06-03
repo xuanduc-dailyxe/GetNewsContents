@@ -1001,13 +1001,8 @@
                     `;
                     imageList.append(thumbHtml);
                     indexCounter++;
-                });
-
-                $('.btn-download').on('click', function () {
-                    const imgSrc = $(this).data('src');
-                    const imgIndex = $(this).data('index');
-                    downloadAndCropImage(imgSrc, imgIndex);
-                });
+                }); 
+                
             }
 
             $('#btnDownloadAll').on('click', function () {
@@ -1217,6 +1212,12 @@
                     } else {
                         editor.setValue('<!-- ⚠️ Không tìm thấy phần nội dung dựa trên cấu hình Class/ID của Profile hiện tại -->');
                     }
+
+                    $('.btn-download').on('click', function () {
+                        const imgSrc = $(this).data('src');
+                        const imgIndex = $(this).data('index');
+                        downloadAndCropImage(imgSrc, imgIndex);
+                    });
 
                 } catch (error) {
                     console.error(error);
