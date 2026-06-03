@@ -547,8 +547,8 @@
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Mô tả tin tức</label>
                         <div class="relative">
-                            <input type="text" id="inputDesc" class="w-full p-2.5 pr-10 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition" placeholder="Nhập mô tả tóm tắt...">
-                            <button class="btn-copy absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-indigo-600 transition p-1.5 rounded" data-target="#inputDesc" title="Sao chép">
+                            <div id="inputDesc" class="w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition" style="height: 100px;"></div>
+                            <button class="btn-copy absolute right-2 top-2 text-gray-400 hover:text-indigo-600 transition p-1.5 rounded z-10 bg-white/80 backdrop-blur-sm" data-target="descEditor" title="Sao chép">
                                 <i class="fa-regular fa-copy"></i>
                             </button>
                         </div>
@@ -633,6 +633,16 @@
             useWorker: false 
         });
 
+        const descEditor = ace.edit("inputDesc");
+        descEditor.setTheme("ace/theme/monokai");
+        descEditor.session.setMode("ace/mode/text");
+        descEditor.setOptions({
+            wrap: true,
+            showPrintMargin: false,
+            fontSize: "14px",
+            useWorker: false
+        });
+
         $(document).ready(function () {
             const imageList = $('#imageList');
             let indexCounter = 1;
@@ -650,7 +660,12 @@
 
             $('.btn-copy').on('click', function() {
                 const targetId = $(this).data('target');
-                const text = $(targetId).val();
+                let text = '';
+                if (targetId === 'descEditor') {
+                    text = descEditor.getValue();
+                } else if ($(targetId).length) {
+                    text = $(targetId).val();
+                }
                 if (!text) return;
                 navigator.clipboard.writeText(text).then(() => {
                     showToast('Đã sao chép vào Clipboard!');
@@ -948,7 +963,7 @@
                 let cleanHTML = rootElement.innerHTML;
 
                 // Thêm đoạn mô tả vào đầu nội dung
-                const descText = $('#inputDesc').val().trim();
+                const descText = descEditor.getValue().trim();
                 if (descText) {
                     cleanHTML = `<h2>${descText}</h2>\n` + cleanHTML;
                 }
@@ -1181,9 +1196,9 @@
                     // Lấy và hiển thị Mô tả
                     if (activeProfile.descSel) {
                         const descEl = doc.querySelector(activeProfile.descSel);
-                        $('#inputDesc').val(descEl ? descEl.textContent.trim() : '');
+                        descEditor.setValue(descEl ? descEl.textContent.trim() : '', -1);
                     } else {
-                        $('#inputDesc').val('');
+                        descEditor.setValue('', -1);
                     }
 
                     // Lấy Nội dung
