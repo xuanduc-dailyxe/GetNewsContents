@@ -1054,9 +1054,10 @@
                     }
 
                     const thumbHtml = `
-                        <div class="relative group border border-gray-200 rounded-lg bg-white overflow-hidden shadow-sm aspect-square flex items-center justify-center hover:border-indigo-400 transition">
+                        <div class="relative group border border-gray-200 rounded-lg bg-white overflow-hidden shadow-sm aspect-square flex items-center justify-center hover:border-indigo-400 transition img-thumb-item">
                             <img src="${src}" class="max-w-full max-h-full object-cover w-full h-full" alt="Thumbnail">
                             <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition"></div>
+                            <button class="btn-remove-img absolute top-1 right-1 bg-red-600 hover:bg-red-700 text-white w-6 h-6 rounded-full shadow-md flex justify-center items-center z-10 opacity-0 group-hover:opacity-100 transition" title="Xóa hình này" style="font-size:13px;line-height:1;">&times;</button>
                             <button class="btn-download absolute bottom-2 right-2 bg-indigo-600 hover:bg-indigo-700 text-white w-9 h-9 rounded-full shadow-lg transition transform translate-y-2 opacity-0 group-hover:opacity-100 group-hover:translate-y-0 flex justify-center items-center" data-src="${src}" data-index="${indexCounter}" title="Download JPG">
                                 <i class="fa-solid fa-download"></i>
                             </button>
@@ -1068,11 +1069,20 @@
                 
             }
 
+            // Xử lý xóa từng hình khỏi danh sách
+            imageList.on('click', '.btn-remove-img', function () {
+                $(this).closest('.img-thumb-item').remove();
+                // Ẩn nút tải nếu không còn hình nào
+                if ($('.btn-download').length === 0) {
+                    $('#downloadButtons').addClass('hidden');
+                }
+            });
+
             $('#btnDownloadAll').on('click', function () {
                 const buttons = $('.btn-download');
                 if (buttons.length === 0) return;
 
-                if (confirm(`Bạn có chắc muốn tải toàn bộ ${buttons.length} hình ảnh không?`)) {
+                if (confirm(`Bạn có chắc muốn tải toàn bộ ${buttons.length} hình ảnh đang hiển thị không?`)) {
                     let delay = 0;
                     buttons.each(function () {
                         const imgSrc = $(this).data('src');
