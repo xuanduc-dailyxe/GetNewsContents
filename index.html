@@ -1029,11 +1029,27 @@
                 return cleanHTML;
             }
 
-            function renderImages(doc, rootElement, activeProfile, baseUrl) {  
-                let imgs = [];  
-                imgs = Array.from(rootElement.querySelectorAll('img'));
+            function renderImages(doc, rootElement, activeProfile, baseUrl) {
+                // Thu thập src từ thẻ <img> (src hoặc data-src)
+                let srcList = [];
 
-                if (imgs.length === 0) {
+                const imgs = Array.from(rootElement.querySelectorAll('img'));
+                imgs.forEach((img) => {
+                    const src = img.getAttribute('src') || img.getAttribute('data-src');
+                    if (src && src.trim()) srcList.push(src.trim());
+                });
+
+                // Nếu không tìm thấy src hợp lệ từ <img>, thử tìm theo cấu trúc
+                // <div class="fig-picture" data-src="..."> (VnExpress và các báo dùng lazy-load figure)
+                if (srcList.length === 0) {
+                    const figPictures = Array.from(rootElement.querySelectorAll('[data-src]'));
+                    figPictures.forEach((el) => {
+                        const src = el.getAttribute('data-src');
+                        if (src && src.trim()) srcList.push(src.trim());
+                    });
+                }
+
+                if (srcList.length === 0) {
                     imageList.append('<div class="col-span-2 text-sm text-gray-500 italic text-center py-10">Không có hình ảnh nào trong bài viết.</div>');
                     $('#downloadButtons').addClass('hidden');
                     return;
@@ -1041,10 +1057,8 @@
 
                 $('#downloadButtons').removeClass('hidden');
 
-                
-                imgs.forEach((img) => {
-                    let src = img.getAttribute('src') || img.getAttribute('data-src');
-                    if (!src) return;
+                srcList.forEach((rawSrc) => {
+                    let src = rawSrc;
                     try {
                         src = new URL(src, baseUrl).href;
                     } catch (e) { }
@@ -1065,8 +1079,7 @@
                     `;
                     imageList.append(thumbHtml);
                     indexCounter++;
-                }); 
-                
+                });
             }
 
             // Xử lý xóa từng hình khỏi danh sách
