@@ -978,7 +978,7 @@
                 });
 
                 // === BƯỚC 2: Xoá các thẻ không cần thiết (sau khi đã xử lý figure/img) ===
-                const badTags = rootElement.querySelectorAll('script, style, iframe, div[class]');
+                const badTags = rootElement.querySelectorAll('script, style, iframe, noscript, div[class]');
                 badTags.forEach(tag => tag.remove());
 
                 // Xoá (unwrap) tất cả thẻ <a> để giữ lại nội dung bên trong (kể cả text hay {{Hình X}})
@@ -1015,6 +1015,24 @@
                         el.className = 'head-black';
                     }
                 });
+
+                // === BƯỚC 3: Xoá tất cả thẻ rỗng (không có text và không có con hữu dụng) ===
+                // Lặp nhiều lần để xử lý thẻ rỗng lồng nhau (ví dụ: <div><span></span></div>)
+                const VOID_ELEMENTS = new Set(['br', 'hr', 'img', 'input', 'meta', 'link', 'area', 'base', 'col', 'embed', 'param', 'source', 'track', 'wbr']);
+                let removed;
+                do {
+                    removed = false;
+                    const allEls = Array.from(rootElement.querySelectorAll('*'));
+                    for (const el of allEls) {
+                        const tag = el.tagName.toLowerCase();
+                        if (VOID_ELEMENTS.has(tag)) continue;
+                        if (!rootElement.contains(el)) continue;
+                        if (el.textContent.trim() === '' && el.children.length === 0) {
+                            el.remove();
+                            removed = true;
+                        }
+                    }
+                } while (removed);
 
                 // Format mã HTML cho đẹp bằng js-beautify
                 let cleanHTML = rootElement.innerHTML;
