@@ -938,39 +938,48 @@
                 }
                 comments.forEach(comment => comment.remove());
 
-                // Xoá các thẻ không cần thiết như script, style, iframe
-                const badTags = rootElement.querySelectorAll('script, style, iframe, div[class]');
-                badTags.forEach(tag => tag.remove());
-
-                // Thay thế thẻ img và figure bằng văn bản {{Hình X}}
+                // === BƯỚC 1: Xử lý figure và img TRƯỚC khi xóa div[class] ===
+                // Lý do: Trong cấu trúc VnExpress-style, img nằm bên trong div.fig-picture (có class),
+                // nếu xóa div[class] trước thì img bị mất theo và figure chỉ còn lại <meta> trơ trọi.
                 let imgIndex = 1;
-                const imgs = Array.from(rootElement.querySelectorAll('img'));
-                imgs.forEach(img => {
-                    if (!rootElement.contains(img)) return; // Bỏ qua nếu đã bị xoá cùng figure cha
 
-                    const figure = img.closest('figure');
-                    
+                // 1a. Xử lý tất cả <figure> — bao gồm cả figure có img trực tiếp
+                //     lẫn figure dùng div.fig-picture (img nằm sâu bên trong)
+                const figures = Array.from(rootElement.querySelectorAll('figure'));
+                figures.forEach(figure => {
+                    if (!rootElement.contains(figure)) return;
+
+                    const figcaption = figure.querySelector('figcaption');
                     const pImageMarker = document.createElement('p');
                     pImageMarker.textContent = `{{Hình ${imgIndex}}}`;
 
-                    if (figure && rootElement.contains(figure)) {
-                        const figcaption = figure.querySelector('figcaption');
-                        let pTag = null;
-                        if (figcaption && figcaption.textContent.trim()) {
-                            pTag = document.createElement('p');
-                            pTag.classList.add('caption');
-                            pTag.textContent = figcaption.textContent.trim();
-                        }
+                    let pTag = null;
+                    if (figcaption && figcaption.textContent.trim()) {
+                        pTag = document.createElement('p');
+                        pTag.classList.add('caption');
+                        pTag.textContent = figcaption.textContent.trim();
+                    }
 
-                        figure.replaceWith(pImageMarker);
-                        if (pTag) {
-                            pImageMarker.parentNode.insertBefore(pTag, pImageMarker.nextSibling);
-                        }
-                    } else {
-                        img.replaceWith(pImageMarker);
+                    figure.replaceWith(pImageMarker);
+                    if (pTag) {
+                        pImageMarker.parentNode.insertBefore(pTag, pImageMarker.nextSibling);
                     }
                     imgIndex++;
                 });
+
+                // 1b. Xử lý các <img> còn sót lại (không nằm trong figure)
+                const remainingImgs = Array.from(rootElement.querySelectorAll('img'));
+                remainingImgs.forEach(img => {
+                    if (!rootElement.contains(img)) return;
+                    const pImageMarker = document.createElement('p');
+                    pImageMarker.textContent = `{{Hình ${imgIndex}}}`;
+                    img.replaceWith(pImageMarker);
+                    imgIndex++;
+                });
+
+                // === BƯỚC 2: Xoá các thẻ không cần thiết (sau khi đã xử lý figure/img) ===
+                const badTags = rootElement.querySelectorAll('script, style, iframe, div[class]');
+                badTags.forEach(tag => tag.remove());
 
                 // Xoá (unwrap) tất cả thẻ <a> để giữ lại nội dung bên trong (kể cả text hay {{Hình X}})
                 const aTags = rootElement.querySelectorAll('a');
@@ -1033,10 +1042,16 @@
                 // Thu thập src từ thẻ <img> (src hoặc data-src)
                 let srcList = [];
 
+                // Hàm kiểm tra URL hình hợp lệ (loại bỏ placeholder base64 lazy-load)
+                function isValidImgSrc(src) {
+                    return src && src.trim() && !src.trim().startsWith('data:');
+                }
+
                 const imgs = Array.from(rootElement.querySelectorAll('img'));
                 imgs.forEach((img) => {
-                    const src = img.getAttribute('src') || img.getAttribute('data-src');
-                    if (src && src.trim()) srcList.push(src.trim());
+                    // Ưu tiên data-src (URL thật) trước src (có thể là placeholder base64)
+                    const src = img.getAttribute('data-src') || img.getAttribute('src');
+                    if (isValidImgSrc(src)) srcList.push(src.trim());
                 });
 
                 // Nếu không tìm thấy src hợp lệ từ <img>, thử tìm theo cấu trúc
@@ -1045,7 +1060,7 @@
                     const figPictures = Array.from(rootElement.querySelectorAll('[data-src]'));
                     figPictures.forEach((el) => {
                         const src = el.getAttribute('data-src');
-                        if (src && src.trim()) srcList.push(src.trim());
+                        if (isValidImgSrc(src)) srcList.push(src.trim());
                     });
                 }
 
