@@ -594,38 +594,72 @@
         </div>
 
         <!-- CỘT 3: Sidebar Phải (Hình ảnh) -->
-        <div class="w-80 bg-white border-l border-gray-200 flex flex-col shrink-0 shadow-sm z-10">
-            <div class="p-4 bg-gray-50 border-b border-gray-200 shrink-0">
-                <h2 class="font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                    <i class="fa-regular fa-images"></i> Quản lý Hình ảnh
-                </h2>
-                <div class="bg-white p-3 border border-gray-200 rounded-lg">
-                    <label class="text-sm font-medium text-gray-600 block mb-2"><i class="fa-solid fa-crop-simple mr-1"></i> Tỉ lệ crop:</label>
-                    <div class="grid grid-cols-2 gap-2">
-                        <button class="crop-ratio-btn py-1.5 border border-gray-300 rounded text-sm font-medium text-gray-600 hover:bg-gray-50 transition" data-value="default">Default</button>
-                        <button class="crop-ratio-btn py-1.5 border border-gray-300 rounded text-sm font-medium text-gray-600 hover:bg-gray-50 transition" data-value="4/3">4:3</button>
-                        <button class="crop-ratio-btn py-1.5 border border-gray-300 rounded text-sm font-medium text-gray-600 hover:bg-gray-50 transition" data-value="3/2">3:2</button>
-                        <button class="crop-ratio-btn py-1.5 border border-gray-300 rounded text-sm font-medium text-gray-600 hover:bg-gray-50 transition" data-value="16/9">16:9</button>
-                        <button class="crop-ratio-btn py-1.5 border border-gray-300 rounded text-sm font-medium text-gray-600 hover:bg-gray-50 transition" data-value="1/1">1:1</button>
+        <div class="w-80 bg-white border-l border-gray-200 flex flex-col shrink-0 shadow-sm z-10 overflow-y-auto">
+
+            <!-- === SECTION: Hình trong bài viết === -->
+            <div id="sectionArticle" class="flex flex-col shrink-0">
+                <div class="p-4 bg-gray-50 border-b border-gray-200 shrink-0">
+                    <h2 class="font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                        <i class="fa-regular fa-image"></i> Hình trong bài viết
+                    </h2>
+                    <div class="bg-white p-3 border border-gray-200 rounded-lg">
+                        <label class="text-sm font-medium text-gray-600 block mb-2"><i class="fa-solid fa-crop-simple mr-1"></i> Tỉ lệ crop:</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button class="crop-ratio-btn py-1.5 border border-gray-300 rounded text-sm font-medium text-gray-600 hover:bg-gray-50 transition" data-section="article" data-value="default">Default</button>
+                            <button class="crop-ratio-btn py-1.5 border border-gray-300 rounded text-sm font-medium text-gray-600 hover:bg-gray-50 transition" data-section="article" data-value="4/3">4:3</button>
+                            <button class="crop-ratio-btn py-1.5 border border-gray-300 rounded text-sm font-medium text-gray-600 hover:bg-gray-50 transition" data-section="article" data-value="3/2">3:2</button>
+                            <button class="crop-ratio-btn py-1.5 border border-gray-300 rounded text-sm font-medium text-gray-600 hover:bg-gray-50 transition" data-section="article" data-value="16/9">16:9</button>
+                            <button class="crop-ratio-btn py-1.5 border border-gray-300 rounded text-sm font-medium text-gray-600 hover:bg-gray-50 transition" data-section="article" data-value="1/1">1:1</button>
+                        </div>
+                        <input type="hidden" id="cropRatioArticle" value="default">
                     </div>
-                    <input type="hidden" id="cropRatio" value="default">
+                    <div id="downloadButtonsArticle" class="mt-2 flex gap-2 hidden">
+                        <button id="btnDownloadAllArticle" class="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium flex items-center justify-center gap-2 shadow-sm text-sm" title="Tải từng hình">
+                            <i class="fa-solid fa-download"></i> Tải tất cả
+                        </button>
+                        <button id="btnDownloadZipArticle" class="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium flex items-center justify-center gap-2 shadow-sm text-sm" title="Tải 1 file Zip">
+                            <i class="fa-solid fa-file-zipper"></i> Tải Zip
+                        </button>
+                    </div>
                 </div>
-                <div id="downloadButtons" class="mt-2 flex gap-2 hidden">
-                    <button id="btnDownloadAll" class="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium flex items-center justify-center gap-2 shadow-sm text-sm" title="Tải từng hình">
-                        <i class="fa-solid fa-download"></i> Tải tất cả
-                    </button>
-                    <button id="btnDownloadZip" class="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium flex items-center justify-center gap-2 shadow-sm text-sm" title="Tải 1 file Zip">
-                        <i class="fa-solid fa-file-zipper"></i> Tải Zip
-                    </button>
+                <div id="imageListArticle" class="p-4 grid grid-cols-2 gap-3 auto-rows-max bg-gray-50/50">
+                    <div class="col-span-2 text-sm text-gray-400 italic text-center py-10">Chưa có hình ảnh nào.</div>
                 </div>
             </div>
 
-            <!-- Image List -->
-            <div id="imageList" class="flex-1 overflow-y-auto p-4 grid grid-cols-2 gap-3 auto-rows-max bg-gray-50/50">
-                <!-- Javascript sẽ render thumbnail vào đây -->
-                <div class="col-span-2 text-sm text-gray-400 italic text-center py-10">Chưa có hình ảnh nào.</div>
+            <!-- === SECTION: Hình Gallery (ẩn mặc định) === -->
+            <div id="sectionGallery" class="flex flex-col shrink-0 hidden border-t-4 border-indigo-200">
+                <div class="p-4 bg-indigo-50 border-b border-indigo-200 shrink-0">
+                    <h2 class="font-semibold text-indigo-700 mb-3 flex items-center gap-2">
+                        <i class="fa-regular fa-images"></i> Hình Gallery
+                    </h2>
+                    <div class="bg-white p-3 border border-indigo-200 rounded-lg">
+                        <label class="text-sm font-medium text-indigo-600 block mb-2"><i class="fa-solid fa-crop-simple mr-1"></i> Tỉ lệ crop:</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button class="crop-ratio-btn py-1.5 border border-gray-300 rounded text-sm font-medium text-gray-600 hover:bg-indigo-50 transition" data-section="gallery" data-value="default">Default</button>
+                            <button class="crop-ratio-btn py-1.5 border border-gray-300 rounded text-sm font-medium text-gray-600 hover:bg-indigo-50 transition" data-section="gallery" data-value="4/3">4:3</button>
+                            <button class="crop-ratio-btn py-1.5 border border-gray-300 rounded text-sm font-medium text-gray-600 hover:bg-indigo-50 transition" data-section="gallery" data-value="3/2">3:2</button>
+                            <button class="crop-ratio-btn py-1.5 border border-gray-300 rounded text-sm font-medium text-gray-600 hover:bg-indigo-50 transition" data-section="gallery" data-value="16/9">16:9</button>
+                            <button class="crop-ratio-btn py-1.5 border border-gray-300 rounded text-sm font-medium text-gray-600 hover:bg-indigo-50 transition" data-section="gallery" data-value="1/1">1:1</button>
+                        </div>
+                        <input type="hidden" id="cropRatioGallery" value="default">
+                    </div>
+                    <div id="downloadButtonsGallery" class="mt-2 flex gap-2 hidden">
+                        <button id="btnDownloadAllGallery" class="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium flex items-center justify-center gap-2 shadow-sm text-sm" title="Tải từng hình">
+                            <i class="fa-solid fa-download"></i> Tải tất cả
+                        </button>
+                        <button id="btnDownloadZipGallery" class="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium flex items-center justify-center gap-2 shadow-sm text-sm" title="Tải 1 file Zip">
+                            <i class="fa-solid fa-file-zipper"></i> Tải Zip
+                        </button>
+                    </div>
+                </div>
+                <div id="imageListGallery" class="p-4 grid grid-cols-2 gap-3 auto-rows-max bg-indigo-50/30">
+                    <div class="col-span-2 text-sm text-indigo-400 italic text-center py-10">Chưa có hình gallery nào.</div>
+                </div>
             </div>
+
         </div>
+
 
     </div>
 
@@ -669,8 +703,10 @@
         });
 
         $(document).ready(function () {
-            const imageList = $('#imageList');
-            let indexCounter = 1;
+            const imageListArticle = $('#imageListArticle');
+            const imageListGallery = $('#imageListGallery');
+            let indexCounterArticle = 1;
+            let indexCounterGallery = 1;
 
             // --- TOAST & COPY LOGIC ---
             let toastTimeout;
@@ -756,25 +792,28 @@
                 localStorage.setItem('scraperUrl', $(this).val().trim());
             });
 
-            function setCropRatioUI(value) {
-                $('#cropRatio').val(value);
-                $('.crop-ratio-btn')
+            function setCropRatioUI(section, value) {
+                const inputId = section === 'gallery' ? '#cropRatioGallery' : '#cropRatioArticle';
+                const lsKey = section === 'gallery' ? 'scraperCropRatioGallery' : 'scraperCropRatioArticle';
+                $(inputId).val(value);
+                // Reset chỉ các button thuộc section này
+                $(`.crop-ratio-btn[data-section="${section}"]`)
                     .removeClass('border-indigo-500 bg-indigo-50 text-indigo-700 ring-1 ring-indigo-500')
-                    .addClass('border-gray-300 text-gray-600 hover:bg-gray-50');
-                
-                $(`.crop-ratio-btn[data-value="${value}"]`)
-                    .removeClass('border-gray-300 text-gray-600 hover:bg-gray-50')
+                    .addClass('border-gray-300 text-gray-600');
+                $(`.crop-ratio-btn[data-section="${section}"][data-value="${value}"]`)
+                    .removeClass('border-gray-300 text-gray-600')
                     .addClass('border-indigo-500 bg-indigo-50 text-indigo-700 ring-1 ring-indigo-500');
-                
-                localStorage.setItem('scraperCropRatio', value);
+                localStorage.setItem(lsKey, value);
             }
 
             $('.crop-ratio-btn').on('click', function () {
-                setCropRatioUI($(this).data('value'));
+                const section = $(this).data('section');
+                setCropRatioUI(section, $(this).data('value'));
             });
 
-            const savedRatio = localStorage.getItem('scraperCropRatio') || 'default';
-            setCropRatioUI(savedRatio);
+            // Restore cropRatio từng section từ localStorage
+            setCropRatioUI('article', localStorage.getItem('scraperCropRatioArticle') || 'default');
+            setCropRatioUI('gallery', localStorage.getItem('scraperCropRatioGallery') || 'default');
 
             function saveProfiles() {
                 localStorage.setItem('scraperProfiles', JSON.stringify(profiles));
@@ -1056,7 +1095,13 @@
                 return cleanHTML;
             }
 
-            function renderImages(doc, rootElement, activeProfile, baseUrl) {
+            function renderImages(doc, rootElement, activeProfile, baseUrl, section) {
+                if (!rootElement) return;
+                section = section || 'article';
+                const isGallery = section === 'gallery';
+                const targetList = isGallery ? imageListGallery : imageListArticle;
+                const downloadBtnId = isGallery ? '#downloadButtonsGallery' : '#downloadButtonsArticle';
+
                 // Thu thập src từ thẻ <img> (src hoặc data-src)
                 let srcList = [];
 
@@ -1083,12 +1128,15 @@
                 }
 
                 if (srcList.length === 0) {
-                    imageList.append('<div class="col-span-2 text-sm text-gray-500 italic text-center py-10">Không có hình ảnh nào trong bài viết.</div>');
-                    $('#downloadButtons').addClass('hidden');
+                    const emptyMsg = isGallery
+                        ? '<div class="col-span-2 text-sm text-indigo-400 italic text-center py-10">Không có hình nào trong Gallery.</div>'
+                        : '<div class="col-span-2 text-sm text-gray-500 italic text-center py-10">Không có hình ảnh nào trong bài viết.</div>';
+                    targetList.append(emptyMsg);
+                    $(downloadBtnId).addClass('hidden');
                     return;
                 }
 
-                $('#downloadButtons').removeClass('hidden');
+                $(downloadBtnId).removeClass('hidden');
 
                 srcList.forEach((rawSrc) => {
                     let src = rawSrc;
@@ -1100,46 +1148,51 @@
                         src = src.split(activeProfile.imgReplace).join(activeProfile.imgReplaceTo || '');
                     }
 
+                    const idxCounter = isGallery ? indexCounterGallery : indexCounterArticle;
                     const thumbHtml = `
-                        <div class="relative group border border-gray-200 rounded-lg bg-white overflow-hidden shadow-sm aspect-square flex items-center justify-center hover:border-indigo-400 transition img-thumb-item">
+                        <div class="relative group border border-gray-200 rounded-lg bg-white overflow-hidden shadow-sm aspect-square flex items-center justify-center hover:border-indigo-400 transition img-thumb-item" data-section="${section}">
                             <img src="${src}" class="max-w-full max-h-full object-cover w-full h-full" alt="Thumbnail">
                             <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition"></div>
-                            <button class="btn-remove-img absolute top-1 right-1 bg-red-600 hover:bg-red-700 text-white w-6 h-6 rounded-full shadow-md flex justify-center items-center z-10 opacity-0 group-hover:opacity-100 transition" title="Xóa hình này" style="font-size:13px;line-height:1;">&times;</button>
-                            <button class="btn-download absolute bottom-2 right-2 bg-indigo-600 hover:bg-indigo-700 text-white w-9 h-9 rounded-full shadow-lg transition transform translate-y-2 opacity-0 group-hover:opacity-100 group-hover:translate-y-0 flex justify-center items-center" data-src="${src}" data-index="${indexCounter}" title="Download JPG">
+                            <button class="btn-remove-img absolute top-1 right-1 bg-red-600 hover:bg-red-700 text-white w-6 h-6 rounded-full shadow-md flex justify-center items-center z-10 opacity-0 group-hover:opacity-100 transition" title="Xóa hình này" data-section="${section}" style="font-size:13px;line-height:1;">&times;</button>
+                            <button class="btn-download absolute bottom-2 right-2 bg-indigo-600 hover:bg-indigo-700 text-white w-9 h-9 rounded-full shadow-lg transition transform translate-y-2 opacity-0 group-hover:opacity-100 group-hover:translate-y-0 flex justify-center items-center" data-src="${src}" data-index="${idxCounter}" data-section="${section}" title="Download JPG">
                                 <i class="fa-solid fa-download"></i>
                             </button>
                         </div>
                     `;
-                    imageList.append(thumbHtml);
-                    indexCounter++;
+                    targetList.append(thumbHtml);
+                    if (isGallery) indexCounterGallery++;
+                    else indexCounterArticle++;
                 });
             }
 
-            // Xử lý xóa từng hình khỏi danh sách
-            imageList.on('click', '.btn-remove-img', function () {
+            // Xử lý xóa từng hình khỏi danh sách (dùng event delegation trên body)
+            $(document).on('click', '.btn-remove-img', function () {
+                const section = $(this).data('section') || 'article';
+                const downloadBtnId = section === 'gallery' ? '#downloadButtonsGallery' : '#downloadButtonsArticle';
                 $(this).closest('.img-thumb-item').remove();
-                // Ẩn nút tải nếu không còn hình nào
-                if ($('.btn-download').length === 0) {
-                    $('#downloadButtons').addClass('hidden');
+                // Ẩn nút tải nếu section đó không còn hình nào
+                if ($(`.btn-download[data-section="${section}"]`).length === 0) {
+                    $(downloadBtnId).addClass('hidden');
                 }
             });
 
-            $('#btnDownloadAll').on('click', function () {
-                const buttons = $('.btn-download');
+            function handleDownloadAll(section) {
+                const buttons = $(`.btn-download[data-section="${section}"]`);
                 if (buttons.length === 0) return;
-
-                if (confirm(`Bạn có chắc muốn tải toàn bộ ${buttons.length} hình ảnh đang hiển thị không?`)) {
+                if (confirm(`Bạn có chắc muốn tải toàn bộ ${buttons.length} hình ảnh không?`)) {
                     let delay = 0;
                     buttons.each(function () {
                         const imgSrc = $(this).data('src');
                         const imgIndex = $(this).data('index');
                         setTimeout(() => {
-                            downloadAndCropImage(imgSrc, imgIndex);
+                            downloadAndCropImage(imgSrc, imgIndex, section);
                         }, delay);
-                        delay += 300; // Tải lần lượt cách nhau 300ms
+                        delay += 300;
                     });
                 }
-            });
+            }
+            $('#btnDownloadAllArticle').on('click', function () { handleDownloadAll('article'); });
+            $('#btnDownloadAllGallery').on('click', function () { handleDownloadAll('gallery'); });
 
             function processImageForZip(imgUrl, imgIndex, slug, ratioStr) {
                 return new Promise((resolve, reject) => {
@@ -1211,19 +1264,19 @@
                 });
             }
 
-            $('#btnDownloadZip').on('click', async function () {
-                const buttons = $('.btn-download');
+            async function handleDownloadZip(section, btn) {
+                const buttons = $(`.btn-download[data-section="${section}"]`);
                 if (buttons.length === 0) return;
 
-                 
-                const btn = $(this);
                 const originalText = btn.html();
                 btn.html('<i class="fa-solid fa-spinner fa-spin"></i> Đang nén...').prop('disabled', true);
 
-                const ratioStr = $('#cropRatio').val();
+                const ratioInputId = section === 'gallery' ? '#cropRatioGallery' : '#cropRatioArticle';
+                const ratioStr = $(ratioInputId).val();
                 const titleText = $('#inputTitle').val().trim();
                 const slug = generateSlug(titleText);
-                
+                const zipSuffix = section === 'gallery' ? '-gallery' : '';
+
                 const zip = new JSZip();
                 let successCount = 0;
 
@@ -1231,9 +1284,9 @@
                     const btnEl = $(buttons[i]);
                     const imgSrc = btnEl.data('src');
                     const imgIndex = btnEl.data('index');
-                    
+
                     try {
-                        const { filename, blob } = await processImageForZip(imgSrc, imgIndex, slug, ratioStr);
+                        const { filename, blob } = await processImageForZip(imgSrc, imgIndex, slug ? slug + zipSuffix : null, ratioStr);
                         zip.file(filename, blob);
                         successCount++;
                     } catch (err) {
@@ -1245,7 +1298,8 @@
                     btn.html('<i class="fa-solid fa-spinner fa-spin"></i> Đang tải...');
                     try {
                         const zipBlob = await zip.generateAsync({ type: "blob" });
-                        const zipFilename = slug ? `${slug}.zip` : `Images_${Math.floor(Date.now() / 1000)}.zip`;
+                        const baseSlug = slug || `Images_${Math.floor(Date.now() / 1000)}`;
+                        const zipFilename = `${baseSlug}${zipSuffix}.zip`;
                         saveAs(zipBlob, zipFilename);
                     } catch (e) {
                         alert("Lỗi khi tạo file ZIP");
@@ -1256,14 +1310,20 @@
                 }
 
                 btn.html(originalText).prop('disabled', false);
-            });
+            }
+            $('#btnDownloadZipArticle').on('click', async function () { await handleDownloadZip('article', $(this)); });
+            $('#btnDownloadZipGallery').on('click', async function () { await handleDownloadZip('gallery', $(this)); });
                
           
 
             $('#btnGetContent').on('click', async () => {
                 const url = $('#inputUrl').val().trim();
-                imageList.empty();
-                indexCounter = 1;
+                imageListArticle.empty();
+                imageListGallery.empty();
+                indexCounterArticle = 1;
+                indexCounterGallery = 1;
+                $('#downloadButtonsArticle, #downloadButtonsGallery').addClass('hidden');
+                $('#sectionGallery').addClass('hidden');
                 localStorage.setItem('scraperUrl', url);
                 if (!url) {
                     alert('Vui lòng nhập URL!');
@@ -1313,14 +1373,21 @@
                     const contentEl = doc.querySelector(activeProfile.contentSel);
 
                     // Render hình ảnh TRƯỚC KHI xoá attribute để có thể đọc data-src nếu web dùng lazyload
-                    renderImages(doc, contentEl, activeProfile, url);
+                    renderImages(doc, contentEl, activeProfile, url, 'article');
 
-                    if (activeProfile.gallerySel) { 
+                    if (activeProfile.gallerySel) {
                         const galleryEls = activeProfile.gallerySel.split(',');
+                        let galleryHasImages = false;
                         galleryEls.forEach(galleryEl => {
-                            const gallery = doc.querySelector(galleryEl);
-                            renderImages(doc, gallery, activeProfile, url);
+                            const gallery = doc.querySelector(galleryEl.trim());
+                            if (gallery) {
+                                renderImages(doc, gallery, activeProfile, url, 'gallery');
+                                galleryHasImages = true;
+                            }
                         });
+                        if (galleryHasImages) {
+                            $('#sectionGallery').removeClass('hidden');
+                        }
                     }
 
                     if (contentEl) {
@@ -1336,10 +1403,11 @@
                         editor.setValue('<!-- ⚠️ Không tìm thấy phần nội dung dựa trên cấu hình Class/ID của Profile hiện tại -->');
                     }
 
-                    $('.btn-download').on('click', function () {
+                    $(document).off('click', '.btn-download').on('click', '.btn-download', function () {
                         const imgSrc = $(this).data('src');
                         const imgIndex = $(this).data('index');
-                        downloadAndCropImage(imgSrc, imgIndex);
+                        const section = $(this).data('section') || 'article';
+                        downloadAndCropImage(imgSrc, imgIndex, section);
                     });
 
                 } catch (error) {
@@ -1369,8 +1437,9 @@
                     .replace(/-+$/, '');
             }
 
-            function downloadAndCropImage(imgUrl, imgIndex) {
-                const ratioStr = $('#cropRatio').val();
+            function downloadAndCropImage(imgUrl, imgIndex, section) {
+                const ratioInputId = section === 'gallery' ? '#cropRatioGallery' : '#cropRatioArticle';
+                const ratioStr = $(ratioInputId).val();
                 
                 const titleText = $('#inputTitle').val().trim();
                 const slug = generateSlug(titleText);
