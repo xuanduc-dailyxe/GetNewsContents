@@ -1282,8 +1282,10 @@
                     // Lấy và hiển thị Mô tả
                     if (activeProfile.descSel) {
                         const descEl = doc.querySelector(activeProfile.descSel);
+                        const descClone = descEl.cloneNode(true);
+                        const cleanedHtml = cleanHtmlAttributes(descClone, url);
                         descEditor.setValue(descEl ? descEl.textContent.trim() : '', -1);
-                        descCodeEditor.setValue(descEl ? descEl.outerHTML.trim() : '', -1);
+                        descCodeEditor.setValue(descEl ? cleanedHtml : '', -1);
                     } else {
                         descEditor.setValue('', -1);
                         descCodeEditor.setValue('', -1);
