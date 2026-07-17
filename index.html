@@ -1284,7 +1284,7 @@
                         const descEl = doc.querySelector(activeProfile.descSel);
                         const descClone = descEl.cloneNode(true);
                         const cleanedHtml = cleanHtmlAttributes(descClone, url);
-                        descEditor.setValue(descEl ? descEl.textContent.trim() : '', -1);
+                        descEditor.setValue(descEl ? cleanedHtml : '', -1);
                         descCodeEditor.setValue(descEl ? cleanedHtml : '', -1);
                     } else {
                         descEditor.setValue('', -1);
